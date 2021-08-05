@@ -1,0 +1,81 @@
+{
+  "project_config": {
+    "module_path": "github.com/a20070322/go_fast_admin",
+    "schema_path": "ent/schema",
+    "service_path": "app/service",
+    "controller_path": "app/controller/admin_controller",
+    "router_path": "router/router_admin.go",
+    "is_force": false
+  },
+  "table": {
+    "name": "CasbinRules",
+    "mixin": [
+      "AuditMixin"
+    ],
+    "fields": [
+      {
+        "type": "String",
+        "name": "ptype",
+        "comment": "类型",
+        "default": "",
+        "is_sensitive": false,
+        "is_optional": false,
+        "is_unique": false
+      },
+      {
+        "type": "String",
+        "name": "v0",
+        "comment": "v0",
+        "default": "",
+        "is_sensitive": false,
+        "is_optional": false,
+        "is_unique": false
+      },
+      {
+        "type": "String",
+        "name": "v1",
+        "comment": "v1",
+        "default": "",
+        "is_sensitive": false,
+        "is_optional": false,
+        "is_unique": false
+      },
+      {
+        "type": "String",
+        "name": "v2",
+        "comment": "v2",
+        "default": "",
+        "is_sensitive": false,
+        "is_optional": false,
+        "is_unique": false
+      },
+      {
+        "type": "String",
+        "name": "v3",
+        "comment": "v3",
+        "default": "",
+        "is_sensitive": false,
+        "is_optional": false,
+        "is_unique": false
+      },
+      {
+        "type": "String",
+        "name": "v4",
+        "comment": "v4",
+        "default": "",
+        "is_sensitive": false,
+        "is_optional": false,
+        "is_unique": false
+      },
+      {
+        "type": "String",
+        "name": "v5",
+        "comment": "v5",
+        "default": "",
+        "is_sensitive": false,
+        "is_optional": false,
+        "is_unique": false
+      }
+    ]
+  }
+}
