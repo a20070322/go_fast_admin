@@ -1,0 +1,41 @@
+package {{Camel2Case .Table.Name}}_service
+
+import (
+	"{{.ProjectConfig.ModulePath}}/ent"
+	"{{.ProjectConfig.ModulePath}}/utils/ent_utils"
+)
+
+type FormList struct {
+	ent_utils.PageOptions
+}
+
+type RepList struct {
+	Data  []*ent.{{.Table.Name}} `json:"data"`
+	Total int              `json:"total"`
+}
+
+type FormCreate struct {
+   {{- range .Table.Fields -}}
+    {{- if ne .Name "id" -}}
+         {{Case2Camel .Name}} {{HumpToLowercase .Type}} `json:"{{.Name}}"
+         {{- if eq .IsOptional false }} binding:"required"{{- end -}}`
+    {{- end }}
+  {{end -}}
+}
+
+type RepCreate struct {
+	*ent.{{.Table.Name}}
+}
+
+type FormUpdate struct {
+   {{- range .Table.Fields -}}
+    {{- if ne .Name "id" -}}
+         {{Case2Camel .Name}} {{HumpToLowercase .Type}} `json:"{{.Name}}"
+         {{- if eq .IsOptional false }} binding:"required"{{- end -}}`
+    {{- end }}
+  {{end -}}
+}
+
+type RepUpdate struct {
+	*ent.{{.Table.Name}}
+}

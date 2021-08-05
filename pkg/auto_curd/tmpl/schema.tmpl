@@ -1,0 +1,54 @@
+package schema
+import (
+	"entgo.io/ent"
+	"entgo.io/ent/schema/field"
+    {{- if IsHasUUidFn .Fields}}
+        "github.com/google/uuid"
+    {{end -}}
+)
+// {{.Name}} holds the schema definition for the {{.Name}} entity.
+type {{.Name}} struct {
+	ent.Schema
+}
+{{$len := len .Mixin}}
+{{- if gt $len 0}}
+func ({{.Name}}) Mixin() []ent.Mixin {
+    return []ent.Mixin{
+    {{- range .Mixin}}
+        {{.}}{},
+    {{end -}}
+    }
+}
+{{end -}}
+
+// Fields of the {{.Name}}.
+func ({{.Name}}) Fields() []ent.Field {
+	return []ent.Field{
+    {{ range .Fields -}}
+        {{- if eq .Type "UUID"}}
+            field.UUID("{{.Name}}", uuid.UUID{}).
+            Default(uuid.New).
+        {{else -}}
+            field.{{.Type}}("{{.Name}}").
+        {{end -}}
+        {{- if .IsSensitive -}}
+            Sensitive().
+        {{end -}}
+        {{- if .IsOptional -}}
+            Optional().
+        {{end -}}
+        {{- if .IsUnique -}}
+            Unique().
+        {{end -}}
+        Comment("{{.Comment -}}"),
+    {{end -}}
+	}
+}
+
+// Edges of the {{.Name}}.
+func ({{.Name}}) Edges() []ent.Edge {
+	return []ent.Edge{
+
+	}
+}
+

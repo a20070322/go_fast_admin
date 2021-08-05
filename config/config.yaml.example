@@ -1,0 +1,55 @@
+# 环境  local  dev  online
+Env: local
+# web config
+Server:
+  port: 8088
+  debug: true
+
+# jwt token config
+Jwt:
+  jwtSecret: xxxxx
+  tokenExpireDuration: 86400
+
+# redis config
+Redis:
+  host: xxx.xxx.xxx.xxx
+  port: 6379
+  password: xxxxx
+  db: 1
+
+# sql config
+Database:
+  host: xxx.xxx.xxx.xxx
+  port: 3306
+  dbname: xxxxx
+  user: xxxxx
+  password: xxxxx
+  debug: true
+  migrate: false
+
+# log config
+Logger:
+  logPath: ./logs/log
+  logErrPath: ./logs/errlog
+  level: debug
+# mini_chat
+MinChat:
+  appId: xxxxx
+  secret: xxxxx
+# 队列
+RabbitMq:
+  UserName: xxxxx
+  PassWord: xxxxx
+  IP: xxx.xxx.xxx.xxx
+  Port: 5672
+  VHost: xxxxx
+# 微信支付
+WechatPay:
+  # 商户号
+  MchID: xxxxx
+  # 商户证书序列号
+  MchCertificateSerialNumber: xxxxx
+  # 商户私钥
+  MchPrivateKey: ./cert/apiclient_key.pem
+  # 商户APIv3密钥
+  MchAPIv3Key: xxxxx

@@ -1,0 +1,10 @@
+{{.Table.Name}}模块
+{{ $router := Camel2Case .Table.Name -}}
+        {{ $controller := GetControllerModule .ProjectConfig.ControllerPath -}}
+        {{.Table.Name}} := api.Group("/{{$router}}").Use(middleware.JwtAuth(jwt.UserGroupAdmin))
+        {{.Table.Name}}.GET("/list",{{$controller}}.{{.Table.Name}}{}.List)
+        {{.Table.Name}}.POST("/create",{{$controller}}.{{.Table.Name}}{}.Create)
+        {{.Table.Name}}.POST("/update/:id",{{$controller}}.{{.Table.Name}}{}.Update)
+        {{.Table.Name}}.POST("/delete/:id",{{$controller}}.{{.Table.Name}}{}.Delete)
+
+{{"//{{.RouteTmpl}}"}}

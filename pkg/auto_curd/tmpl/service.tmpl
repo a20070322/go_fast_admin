@@ -1,0 +1,129 @@
+package {{Camel2Case .Table.Name}}_service
+{{ $name := HumpToLowercase .Table.Name }}
+import (
+	"context"
+	"errors"
+	"{{.ProjectConfig.ModulePath}}/ent"
+	"{{.ProjectConfig.ModulePath}}/ent/{{$name}}"
+	"{{.ProjectConfig.ModulePath}}/ent/predicate"
+	"{{.ProjectConfig.ModulePath}}/global"
+	"{{.ProjectConfig.ModulePath}}/utils/ent_utils"
+    {{- if IdIsUUIDFn .Table.Fields}}
+    "github.com/google/uuid"
+    {{end}}
+	"time"
+)
+
+//初始化 {{.Table.Name}} service
+func Init(ctx context.Context) *{{.Table.Name}} {
+	art := &{{.Table.Name}}{}
+	art.db = global.Db.{{.Table.Name}}
+	art.ctx = ctx
+	return art
+}
+
+type {{.Table.Name}} struct {
+	db  *ent.{{.Table.Name}}Client
+	ctx context.Context
+}
+
+
+//列表
+func (m *{{.Table.Name}}) List(form *FormList) (rep RepList, err error) {
+	// 设置分页默认值
+	ent_utils.PipePagerFn(form)
+	//查询条件数组
+	var whereArr []predicate.{{.Table.Name}}
+	whereArr = append(whereArr, {{$name}}.DeletedAtIsNil())
+	//查询
+	db := m.db.Query().Where(whereArr...)
+	//获取总条数
+	total, err := db.Count(m.ctx)
+	if err != nil {
+		return rep, err
+	}
+	rep.Total = total
+	// 设置自动分页
+	ent_utils.PipeLimitFn(db, form)
+	rep.Data, err = db.All(m.ctx)
+	if err != nil {
+		return rep, err
+	}
+	return rep, nil
+}
+
+
+//创建
+func (m *{{.Table.Name}}) Create(form *FormCreate) (rep RepCreate, err error) {
+	db := m.db.
+		Create().
+		{{ $len := len .Table.Fields}}
+        {{- range $key, $value := .Table.Fields -}}
+            {{- if CheckEqLine $len $key -}}
+             Set{{Case2Camel $value.Name}}(form.{{Case2Camel $value.Name}})
+            {{- else -}}
+             Set{{Case2Camel $value.Name}}(form.{{Case2Camel $value.Name}}).
+            {{- end}}
+        {{end}}
+	u, err := db.Save(m.ctx)
+	if err != nil {
+		return rep, err
+	}
+	rep.{{.Table.Name}} = u
+	return rep, nil
+}
+
+//更新
+func (m *{{.Table.Name}}) Update(id {{- if IdIsUUIDFn .Table.Fields}} string {{- else }} int {{end -}}, form *FormUpdate) (rep RepUpdate, err error) {
+	fup, err := m.FindById(id)
+	if err != nil {
+		return rep, errors.New("user is not find")
+	}
+	db := fup.
+		Update().
+		{{ $len := len .Table.Fields}}
+       {{- range $key, $value := .Table.Fields -}}
+            {{- if CheckEqLine $len $key -}}
+             Set{{Case2Camel $value.Name}}(form.{{Case2Camel $value.Name}})
+            {{- else -}}
+             Set{{Case2Camel $value.Name}}(form.{{Case2Camel $value.Name}}).
+            {{- end}}
+        {{end}}
+	u, err := db.Save(m.ctx)
+	if err != nil {
+		return rep, err
+	}
+	rep.{{.Table.Name}} = u
+	return rep, nil
+}
+
+//删除
+func (m *{{.Table.Name}}) Delete(id {{- if IdIsUUIDFn .Table.Fields}} string {{- else }} int {{end -}}) (err error) {
+    fup, err := m.FindById(id)
+	if err != nil {
+		return errors.New("{{.Table.Name}} is not find")
+	}
+	db := fup.
+		Update().
+		SetDeletedAt(time.Now())
+	_, err = db.Save(m.ctx)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+//查找
+func (m *{{.Table.Name}}) FindById(id {{- if IdIsUUIDFn .Table.Fields}} string {{- else}} int {{end -}}) (rep *ent.{{.Table.Name}}, err error) {
+	rep, err = m.db.Query().Where({{$name}}.IDEQ(
+	{{- if IdIsUUIDFn .Table.Fields -}}
+        uuid.MustParse(id)
+    {{- else -}}
+        id
+    {{- end -}}
+    ),{{$name}}.DeletedAtIsNil()).First(m.ctx)
+	if err != nil {
+		return rep, errors.New("user is not find")
+	}
+	return rep, err
+}
