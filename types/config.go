@@ -1,13 +1,13 @@
 package types
 
 type AppConfigure struct {
-	Version   string     `yaml:"Version"`
+	Version   string           `yaml:"Version"`
 	Server    *ServerConfig    `yaml:"Server"`
-	Jwt       *JwtConfig `yaml:ConfigJwt`
+	Jwt       *JwtConfig       `yaml:ConfigJwt`
 	Redis     *RedisConfig     `yaml:Redis`
 	Database  *DatabaseConfig  `yaml:Database`
 	Logger    *LoggerConfig    `yaml:Logger`
-	Env       string     `yaml:Env`
+	Env       string           `yaml:Env`
 	MinChat   *MinChatConfig   `yaml:MinChat`
 	RabbitMq  *RabbitMqConfig  `yaml:RabbitMq`
 	WechatPay *WechatPayConfig `yaml:WechatPay`

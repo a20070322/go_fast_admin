@@ -9,8 +9,4 @@ func Init() {
 	RedisConfig()
 	//数据库初始化
 	EntInit()
-	//权限初始化
-	CasbinInit()
-
-
 }

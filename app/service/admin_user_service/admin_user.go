@@ -3,7 +3,6 @@ package admin_user_service
 import (
 	"context"
 	"errors"
-	"fmt"
 	"github.com/a20070322/go_fast_admin/ent"
 	"github.com/a20070322/go_fast_admin/ent/adminrole"
 	"github.com/a20070322/go_fast_admin/ent/adminuser"
@@ -29,7 +28,6 @@ type AdminUser struct {
 
 //列表
 func (m *AdminUser) List(form *FromList) (rep RepList, err error) {
-	fmt.Println(form)
 	// 设置分页默认值
 	ent_utils.PipePagerFn(form)
 	//查询条件数组
@@ -104,18 +102,9 @@ func (m *AdminUser) Update(id string, form *FromUpdate) (rep RepCommon, err erro
 		//SetPassword(form.Password).
 		SetAvatar(form.Avatar).
 		SetPhone(form.Phone).
-		SetIsEnable(form.IsEnable)
-	roleLen := len(fup.Edges.Role)
-	for _, v := range form.Roles {
-		for _, rv := range fup.Edges.Role {
-			if v == rv.ID {
-				roleLen--
-			}
-		}
-	}
-	if roleLen > 0 {
-		db.ClearRole().AddRoleIDs(form.Roles...)
-	}
+		SetIsEnable(form.IsEnable).
+		ClearRole().
+		AddRoleIDs(form.Roles...)
 	u, err := db.Save(m.ctx)
 	if err != nil {
 		return rep, err
@@ -142,7 +131,7 @@ func (m *AdminUser) Delete(id string) (err error) {
 
 //查找
 func (m *AdminUser) FindById(id string) (rep *ent.AdminUser, err error) {
-	rep, err = m.db.Query().Where(adminuser.IDEQ(uuid.MustParse(id)), adminuser.DeletedAtIsNil()).WithRole().First(m.ctx)
+	rep, err = m.db.Query().Where(adminuser.IDEQ(uuid.MustParse(id)), adminuser.DeletedAtIsNil()).First(m.ctx)
 	if err != nil {
 		return rep, errors.New("user is not find")
 	}

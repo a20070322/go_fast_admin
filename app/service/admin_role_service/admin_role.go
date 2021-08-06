@@ -88,7 +88,6 @@ func (m *AdminRole) Update(id int, form *FormUpdate) (rep RepUpdate, err error) 
 		Update().
 		SetName(form.Name).
 		SetIsEnable(form.IsEnable)
-
 	u, err := db.Save(m.ctx)
 	if err != nil {
 		return rep, err
@@ -116,6 +115,14 @@ func (m *AdminRole) Delete(id int) (err error) {
 //查找
 func (m *AdminRole) FindById(id int) (rep *ent.AdminRole, err error) {
 	rep, err = m.db.Query().Where(adminrole.IDEQ(id), adminrole.DeletedAtIsNil()).First(m.ctx)
+	if err != nil {
+		return rep, errors.New("user is not find")
+	}
+	return rep, err
+}
+
+func (m *AdminRole) FindByIdWithMenu(id int) (rep *ent.AdminRole, err error) {
+	rep, err = m.db.Query().Where(adminrole.IDEQ(id), adminrole.DeletedAtIsNil()).WithMenu().First(m.ctx)
 	if err != nil {
 		return rep, errors.New("user is not find")
 	}

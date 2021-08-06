@@ -4,9 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/a20070322/go_fast_admin/app/service/cache_service"
 	"github.com/a20070322/go_fast_admin/ent"
 	"github.com/a20070322/go_fast_admin/ent/adminmenus"
-	"github.com/a20070322/go_fast_admin/ent/adminrole"
 	"github.com/a20070322/go_fast_admin/ent/predicate"
 	"github.com/a20070322/go_fast_admin/global"
 	"github.com/a20070322/go_fast_admin/utils/ent_utils"
@@ -61,7 +61,7 @@ func (m *AdminMenus) TreeList(form *FormList) (rep []*MenusTree, err error) {
 		return rep, err
 	}
 	fmt.Println(len(list))
-	return MenuToTree(list, 0), nil
+	return MenuToTree(list, 0, 0), nil
 }
 
 //创建
@@ -148,28 +148,56 @@ func (m *AdminMenus) FindById(id int) (rep *ent.AdminMenus, err error) {
 	return rep, err
 }
 
+//func (m *AdminMenus) GetUserMenu(roleIds []int) (RepGetUserMenu, error) {
+//	var rep RepGetUserMenu
+//	//获取目录及菜单
+//	menus, err := m.db.Query().Where(adminmenus.DeletedAtIsNil(), adminmenus.HasRoleWith(adminrole.IDIn(roleIds...)), adminmenus.TypeIn(1, 2), adminmenus.IsEnable(true)).All(m.ctx)
+//	if err != nil {
+//		return rep, err
+//	}
+//	rep.Menu = MenuToTree(menus, 0, 1)
+//	rep.Role, err = m.db.Query().Where(adminmenus.DeletedAtIsNil(), adminmenus.HasRoleWith(adminrole.IDIn(roleIds...)), adminmenus.TypeEQ(3), adminmenus.IsEnable(true)).All(m.ctx)
+//	if err != nil {
+//		return rep, err
+//	}
+//	return rep, err
+//}
+
 func (m *AdminMenus) GetUserMenu(roleIds []int) (RepGetUserMenu, error) {
 	var rep RepGetUserMenu
-	//获取目录及菜单
-	menus, err := m.db.Query().Where(adminmenus.DeletedAtIsNil(), adminmenus.HasRoleWith(adminrole.IDIn(roleIds...)), adminmenus.TypeIn(1, 2), adminmenus.IsEnable(true)).All(m.ctx)
-	if err != nil {
-		return rep, err
+	var menus []*ent.AdminMenus
+	for _,v := range  roleIds {
+	   role,err := cache_service.Init(m.ctx).GetAdminRoleCatch(v)
+	   if err != nil {
+	   	return rep, err
+	   }
+	   if role.IsEnable == true {
+	   		for _,menu := range role.Edges.Menu{
+				if menu.IsEnable == true {
+					//目录及菜单
+					if menu.Type == 1 ||menu.Type == 2  {
+						menus = append(menus,menu)
+					}
+					//按钮带权限标识
+					if menu.Type == 3  {
+						rep.Role = append(rep.Role,menu)
+					}
+				}
+			}
+
+	   }
 	}
-	rep.Menu = MenuToTree(menus, 0)
-	rep.Role, err = m.db.Query().Where(adminmenus.DeletedAtIsNil(), adminmenus.HasRoleWith(adminrole.IDIn(roleIds...)), adminmenus.TypeEQ(3), adminmenus.IsEnable(true)).All(m.ctx)
-	if err != nil {
-		return rep, err
-	}
-	return rep, err
+	rep.Menu = MenuToTree(menus, 0, 1)
+	return rep, nil
 }
 
-func MenuToTree(menus []*ent.AdminMenus, fid int) []*MenusTree {
+func MenuToTree(menus []*ent.AdminMenus, fid int, t int) []*MenusTree {
 	var treeList []*MenusTree
 	for _, v := range menus {
-		if v.Fid == fid {
+		if v.Fid == fid && (v.IsShow && v.IsEnable || t != 1) {
 			treeList = append(treeList, &MenusTree{
 				AdminMenus: v,
-				Children:   MenuToTree(menus, v.ID),
+				Children:   MenuToTree(menus, v.ID, t),
 			})
 		}
 	}

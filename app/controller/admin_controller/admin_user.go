@@ -2,6 +2,8 @@ package admin_controller
 
 import (
 	"github.com/a20070322/go_fast_admin/app/service/admin_user_service"
+	"github.com/a20070322/go_fast_admin/app/service/cache_service"
+	"github.com/a20070322/go_fast_admin/global"
 	"github.com/a20070322/go_fast_admin/utils/response"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -52,6 +54,15 @@ func (c AdminUser) Update(ctx *gin.Context) {
 		return
 	}
 	rep, err := admin_user_service.Init(ctx).Update(id, &form)
+	catch:=  cache_service.Init(ctx)
+	if catch.CheckAdminUserCatch(id) {
+		u, err := admin_user_service.Init(ctx).FindById(id)
+		if err != nil {
+			global.Logger.Error(err)
+		}
+		err = catch.SetAdminUserCatch(u)
+		global.Logger.Error(err)
+	}
 	if err != nil {
 		response.Fail(ctx, http.StatusBadRequest, err.Error(), nil)
 		return

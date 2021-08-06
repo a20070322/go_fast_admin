@@ -13,7 +13,6 @@ import (
 	"github.com/a20070322/go_fast_admin/ent/adminmenus"
 	"github.com/a20070322/go_fast_admin/ent/adminrole"
 	"github.com/a20070322/go_fast_admin/ent/adminuser"
-	"github.com/a20070322/go_fast_admin/ent/casbinrules"
 )
 
 // ent aliases to avoid import conflicts in user's code.
@@ -34,10 +33,9 @@ type OrderFunc func(*sql.Selector)
 // columnChecker returns a function indicates if the column exists in the given column.
 func columnChecker(table string) func(string) error {
 	checks := map[string]func(string) bool{
-		adminmenus.Table:  adminmenus.ValidColumn,
-		adminrole.Table:   adminrole.ValidColumn,
-		adminuser.Table:   adminuser.ValidColumn,
-		casbinrules.Table: casbinrules.ValidColumn,
+		adminmenus.Table: adminmenus.ValidColumn,
+		adminrole.Table:  adminrole.ValidColumn,
+		adminuser.Table:  adminuser.ValidColumn,
 	}
 	check, ok := checks[table]
 	if !ok {

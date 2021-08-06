@@ -14,6 +14,3 @@ type AdminRole func(*sql.Selector)
 
 // AdminUser is the predicate function for adminuser builders.
 type AdminUser func(*sql.Selector)
-
-// CasbinRules is the predicate function for casbinrules builders.
-type CasbinRules func(*sql.Selector)

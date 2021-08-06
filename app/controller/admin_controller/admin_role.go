@@ -2,6 +2,8 @@ package admin_controller
 
 import (
 	"github.com/a20070322/go_fast_admin/app/service/admin_role_service"
+	"github.com/a20070322/go_fast_admin/app/service/cache_service"
+	"github.com/a20070322/go_fast_admin/global"
 	"github.com/a20070322/go_fast_admin/utils/response"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -55,6 +57,17 @@ func (c AdminRole) Update(ctx *gin.Context) {
 		response.Fail(ctx, http.StatusBadRequest, err.Error(), nil)
 		return
 	}
+	catch:=  cache_service.Init(ctx)
+	if catch.CheckAdminRoleCatch(id) {
+		u, err := admin_role_service.Init(ctx).FindByIdWithMenu(id)
+		if err != nil {
+			global.Logger.Error(err)
+		}
+		err = catch.SetAdminRoleCatch(u)
+		if err != nil {
+			global.Logger.Error(err)
+		}
+	}
 	response.Success(ctx, "ok", rep)
 }
 
@@ -99,6 +112,17 @@ func (c AdminRole) SetMenus(ctx *gin.Context) {
 		return
 	}
 	err = admin_role_service.Init(ctx).SetMenus(id, &form)
+	catch:=  cache_service.Init(ctx)
+	if catch.CheckAdminRoleCatch(id) {
+		u, err := admin_role_service.Init(ctx).FindByIdWithMenu(id)
+		if err != nil {
+			global.Logger.Error(err)
+		}
+		err = catch.SetAdminRoleCatch(u)
+		if err != nil {
+			global.Logger.Error(err)
+		}
+	}
 	if err != nil {
 		response.Fail(ctx, http.StatusBadRequest, err.Error(), nil)
 		return

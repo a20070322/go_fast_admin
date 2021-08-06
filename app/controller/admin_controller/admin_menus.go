@@ -1,9 +1,8 @@
 package admin_controller
 
 import (
-	"fmt"
 	"github.com/a20070322/go_fast_admin/app/service/admin_menus_service"
-	"github.com/a20070322/go_fast_admin/app/service/admin_user_service"
+	"github.com/a20070322/go_fast_admin/app/service/cache_service"
 	"github.com/a20070322/go_fast_admin/utils/jwt"
 	"github.com/a20070322/go_fast_admin/utils/response"
 	"github.com/gin-gonic/gin"
@@ -88,26 +87,54 @@ func (c AdminMenus) Delete(ctx *gin.Context) {
 	response.Success(ctx, "ok", "")
 }
 
+//func (c AdminMenus) GetUserMenu(ctx *gin.Context) {
+//	uid, err := jwt.GetTokenId(ctx)
+//	if err != nil {
+//		response.Fail(ctx, http.StatusUnprocessableEntity, err.Error(), nil)
+//	}
+//	if uid == ""{
+//		response.Fail(ctx, http.StatusUnprocessableEntity, "用户未找到", nil)
+//	}
+//	user, err := admin_user_service.Init(ctx).FindById(uid)
+//	//用户角色列表
+//	var roles []int
+//	if err != nil {
+//		response.Fail(ctx, http.StatusInternalServerError, err.Error(), nil)
+//		return
+//	}
+//	for _, v := range user.Edges.Role {
+//		if v.IsEnable == true{
+//			roles = append(roles, v.ID)
+//		}
+//	}
+//	rep,err := admin_menus_service.Init(ctx).GetUserMenu(roles)
+//	if err != nil {
+//		response.Fail(ctx, http.StatusInternalServerError, err.Error(), nil)
+//		return
+//	}
+//	response.Success(ctx, "ok", rep)
+//}
+
 func (c AdminMenus) GetUserMenu(ctx *gin.Context) {
 	uid, err := jwt.GetTokenId(ctx)
 	if err != nil {
 		response.Fail(ctx, http.StatusUnprocessableEntity, err.Error(), nil)
 	}
-	fmt.Println(uid,"123")
-	if uid == ""{
+	if uid == "" {
 		response.Fail(ctx, http.StatusUnprocessableEntity, "用户未找到", nil)
 	}
-	user, err := admin_user_service.Init(ctx).FindById(uid)
-	//用户角色列表
 	var roles []int
+	u, err := cache_service.Init(ctx).GetAdminUserCatch(uid)
 	if err != nil {
 		response.Fail(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
-	for _, v := range user.Edges.Role {
-		roles = append(roles, v.ID)
-	}
 
+	for _, v := range u.Edges.Role {
+		if v.IsEnable {
+			roles = append(roles,v.ID)
+		}
+	}
 	rep,err := admin_menus_service.Init(ctx).GetUserMenu(roles)
 	if err != nil {
 		response.Fail(ctx, http.StatusInternalServerError, err.Error(), nil)
@@ -115,5 +142,3 @@ func (c AdminMenus) GetUserMenu(ctx *gin.Context) {
 	}
 	response.Success(ctx, "ok", rep)
 }
-
-

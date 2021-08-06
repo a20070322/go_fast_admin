@@ -2,12 +2,10 @@ package admin_controller
 
 import (
 	"github.com/a20070322/go_fast_admin/app/service/admin_auth_service"
-	"github.com/a20070322/go_fast_admin/ent/adminuser"
-	"github.com/a20070322/go_fast_admin/global"
+	"github.com/a20070322/go_fast_admin/app/service/admin_user_service"
 	"github.com/a20070322/go_fast_admin/utils/jwt"
 	"github.com/a20070322/go_fast_admin/utils/response"
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"net/http"
 )
 
@@ -53,7 +51,7 @@ func (c AdminAuth) RefreshToken(ctx *gin.Context) {
 		response.Fail(ctx, http.StatusBadRequest, "refresh_token已失效", nil)
 		return
 	}
-	user, err3 := global.Db.AdminUser.Query().Where(adminuser.IDEQ(uuid.MustParse(claims.UserID))).First(ctx)
+	user, err3 := admin_user_service.Init(ctx).FindById(claims.UserID)
 	if err3 != nil && user != nil {
 		response.Fail(ctx, http.StatusInternalServerError, err2.Error(), nil)
 		return

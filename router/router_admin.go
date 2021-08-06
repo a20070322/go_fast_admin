@@ -21,7 +21,7 @@ func AdminRouter(r *gin.RouterGroup) {
 	auth.POST("/refresh_token", admin_controller.AdminAuth{}.RefreshToken)
 
 	//user模块
-	user := api.Group("/user").Use(middleware.JwtAuth(jwt.UserGroupAdmin),middleware.Casbin())
+	user := api.Group("/user").Use(middleware.JwtAuth(jwt.UserGroupAdmin),middleware.AdminRbac())
 	user.GET("/list", admin_controller.AdminUser{}.List)
 	user.POST("/create", admin_controller.AdminUser{}.Create)
 	user.POST("/update/:id", admin_controller.AdminUser{}.Update)
@@ -29,7 +29,7 @@ func AdminRouter(r *gin.RouterGroup) {
 
 
 	//AdminMenus模块
-	AdminMenus := api.Group("/admin_menus").Use(middleware.JwtAuth(jwt.UserGroupAdmin),middleware.Casbin())
+	AdminMenus := api.Group("/admin_menus").Use(middleware.JwtAuth(jwt.UserGroupAdmin),middleware.AdminRbac())
 	//AdminMenus.GET("/list", admin_controller.AdminMenus{}.List)
 	AdminMenus.GET("/tree_list", admin_controller.AdminMenus{}.TreeList)
 	AdminMenus.POST("/create", admin_controller.AdminMenus{}.Create)
@@ -38,7 +38,7 @@ func AdminRouter(r *gin.RouterGroup) {
 
 
 	//AdminRole模块
-	AdminRole := api.Group("/admin_role").Use(middleware.JwtAuth(jwt.UserGroupAdmin),middleware.Casbin())
+	AdminRole := api.Group("/admin_role").Use(middleware.JwtAuth(jwt.UserGroupAdmin),middleware.AdminRbac())
 	AdminRole.GET("/list", admin_controller.AdminRole{}.List)
 	AdminRole.POST("/create", admin_controller.AdminRole{}.Create)
 	AdminRole.POST("/update/:id", admin_controller.AdminRole{}.Update)

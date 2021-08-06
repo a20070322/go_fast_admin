@@ -13,7 +13,6 @@ import (
 	"github.com/a20070322/go_fast_admin/ent/adminmenus"
 	"github.com/a20070322/go_fast_admin/ent/adminrole"
 	"github.com/a20070322/go_fast_admin/ent/adminuser"
-	"github.com/a20070322/go_fast_admin/ent/casbinrules"
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
@@ -31,8 +30,6 @@ type Client struct {
 	AdminRole *AdminRoleClient
 	// AdminUser is the client for interacting with the AdminUser builders.
 	AdminUser *AdminUserClient
-	// CasbinRules is the client for interacting with the CasbinRules builders.
-	CasbinRules *CasbinRulesClient
 }
 
 // NewClient creates a new client configured with the given options.
@@ -49,7 +46,6 @@ func (c *Client) init() {
 	c.AdminMenus = NewAdminMenusClient(c.config)
 	c.AdminRole = NewAdminRoleClient(c.config)
 	c.AdminUser = NewAdminUserClient(c.config)
-	c.CasbinRules = NewCasbinRulesClient(c.config)
 }
 
 // Open opens a database/sql.DB specified by the driver name and
@@ -81,12 +77,11 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:         ctx,
-		config:      cfg,
-		AdminMenus:  NewAdminMenusClient(cfg),
-		AdminRole:   NewAdminRoleClient(cfg),
-		AdminUser:   NewAdminUserClient(cfg),
-		CasbinRules: NewCasbinRulesClient(cfg),
+		ctx:        ctx,
+		config:     cfg,
+		AdminMenus: NewAdminMenusClient(cfg),
+		AdminRole:  NewAdminRoleClient(cfg),
+		AdminUser:  NewAdminUserClient(cfg),
 	}, nil
 }
 
@@ -104,11 +99,10 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		config:      cfg,
-		AdminMenus:  NewAdminMenusClient(cfg),
-		AdminRole:   NewAdminRoleClient(cfg),
-		AdminUser:   NewAdminUserClient(cfg),
-		CasbinRules: NewCasbinRulesClient(cfg),
+		config:     cfg,
+		AdminMenus: NewAdminMenusClient(cfg),
+		AdminRole:  NewAdminRoleClient(cfg),
+		AdminUser:  NewAdminUserClient(cfg),
 	}, nil
 }
 
@@ -141,7 +135,6 @@ func (c *Client) Use(hooks ...Hook) {
 	c.AdminMenus.Use(hooks...)
 	c.AdminRole.Use(hooks...)
 	c.AdminUser.Use(hooks...)
-	c.CasbinRules.Use(hooks...)
 }
 
 // AdminMenusClient is a client for the AdminMenus schema.
@@ -476,94 +469,4 @@ func (c *AdminUserClient) QueryRole(au *AdminUser) *AdminRoleQuery {
 // Hooks returns the client hooks.
 func (c *AdminUserClient) Hooks() []Hook {
 	return c.hooks.AdminUser
-}
-
-// CasbinRulesClient is a client for the CasbinRules schema.
-type CasbinRulesClient struct {
-	config
-}
-
-// NewCasbinRulesClient returns a client for the CasbinRules from the given config.
-func NewCasbinRulesClient(c config) *CasbinRulesClient {
-	return &CasbinRulesClient{config: c}
-}
-
-// Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `casbinrules.Hooks(f(g(h())))`.
-func (c *CasbinRulesClient) Use(hooks ...Hook) {
-	c.hooks.CasbinRules = append(c.hooks.CasbinRules, hooks...)
-}
-
-// Create returns a create builder for CasbinRules.
-func (c *CasbinRulesClient) Create() *CasbinRulesCreate {
-	mutation := newCasbinRulesMutation(c.config, OpCreate)
-	return &CasbinRulesCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// CreateBulk returns a builder for creating a bulk of CasbinRules entities.
-func (c *CasbinRulesClient) CreateBulk(builders ...*CasbinRulesCreate) *CasbinRulesCreateBulk {
-	return &CasbinRulesCreateBulk{config: c.config, builders: builders}
-}
-
-// Update returns an update builder for CasbinRules.
-func (c *CasbinRulesClient) Update() *CasbinRulesUpdate {
-	mutation := newCasbinRulesMutation(c.config, OpUpdate)
-	return &CasbinRulesUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOne returns an update builder for the given entity.
-func (c *CasbinRulesClient) UpdateOne(cr *CasbinRules) *CasbinRulesUpdateOne {
-	mutation := newCasbinRulesMutation(c.config, OpUpdateOne, withCasbinRules(cr))
-	return &CasbinRulesUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOneID returns an update builder for the given id.
-func (c *CasbinRulesClient) UpdateOneID(id int) *CasbinRulesUpdateOne {
-	mutation := newCasbinRulesMutation(c.config, OpUpdateOne, withCasbinRulesID(id))
-	return &CasbinRulesUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// Delete returns a delete builder for CasbinRules.
-func (c *CasbinRulesClient) Delete() *CasbinRulesDelete {
-	mutation := newCasbinRulesMutation(c.config, OpDelete)
-	return &CasbinRulesDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// DeleteOne returns a delete builder for the given entity.
-func (c *CasbinRulesClient) DeleteOne(cr *CasbinRules) *CasbinRulesDeleteOne {
-	return c.DeleteOneID(cr.ID)
-}
-
-// DeleteOneID returns a delete builder for the given id.
-func (c *CasbinRulesClient) DeleteOneID(id int) *CasbinRulesDeleteOne {
-	builder := c.Delete().Where(casbinrules.ID(id))
-	builder.mutation.id = &id
-	builder.mutation.op = OpDeleteOne
-	return &CasbinRulesDeleteOne{builder}
-}
-
-// Query returns a query builder for CasbinRules.
-func (c *CasbinRulesClient) Query() *CasbinRulesQuery {
-	return &CasbinRulesQuery{
-		config: c.config,
-	}
-}
-
-// Get returns a CasbinRules entity by its id.
-func (c *CasbinRulesClient) Get(ctx context.Context, id int) (*CasbinRules, error) {
-	return c.Query().Where(casbinrules.ID(id)).Only(ctx)
-}
-
-// GetX is like Get, but panics if an error occurs.
-func (c *CasbinRulesClient) GetX(ctx context.Context, id int) *CasbinRules {
-	obj, err := c.Get(ctx, id)
-	if err != nil {
-		panic(err)
-	}
-	return obj
-}
-
-// Hooks returns the client hooks.
-func (c *CasbinRulesClient) Hooks() []Hook {
-	return c.hooks.CasbinRules
 }

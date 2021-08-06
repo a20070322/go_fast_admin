@@ -12,10 +12,6 @@ func main()  {
 		Name:    "go_fast_admin",
 		Usage:   "api server",
 		Version: "1.0.0",
-		//Action: func(context *cli.Context) error {
-		//	fmt.Println("go_fast_admin server")
-		//	return nil
-		//},
 		Commands: []*cli.Command{
 			cmd.Server,
 			cmd.EntMigrate,

@@ -69,24 +69,6 @@ var (
 		PrimaryKey:  []*schema.Column{AdminUsersColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{},
 	}
-	// CasbinRulesColumns holds the columns for the "casbin_rules" table.
-	CasbinRulesColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "ptype", Type: field.TypeString, Nullable: true, Default: ""},
-		{Name: "v0", Type: field.TypeString, Nullable: true, Default: ""},
-		{Name: "v1", Type: field.TypeString, Nullable: true, Default: ""},
-		{Name: "v2", Type: field.TypeString, Nullable: true, Default: ""},
-		{Name: "v3", Type: field.TypeString, Nullable: true, Default: ""},
-		{Name: "v4", Type: field.TypeString, Nullable: true, Default: ""},
-		{Name: "v5", Type: field.TypeString, Nullable: true, Default: ""},
-	}
-	// CasbinRulesTable holds the schema information for the "casbin_rules" table.
-	CasbinRulesTable = &schema.Table{
-		Name:        "casbin_rules",
-		Columns:     CasbinRulesColumns,
-		PrimaryKey:  []*schema.Column{CasbinRulesColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{},
-	}
 	// AdminRoleUserColumns holds the columns for the "admin_role_user" table.
 	AdminRoleUserColumns = []*schema.Column{
 		{Name: "admin_role_id", Type: field.TypeInt},
@@ -142,7 +124,6 @@ var (
 		AdminMenusTable,
 		AdminRolesTable,
 		AdminUsersTable,
-		CasbinRulesTable,
 		AdminRoleUserTable,
 		AdminRoleMenuTable,
 	}

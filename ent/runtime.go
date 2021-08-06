@@ -8,7 +8,6 @@ import (
 	"github.com/a20070322/go_fast_admin/ent/adminmenus"
 	"github.com/a20070322/go_fast_admin/ent/adminrole"
 	"github.com/a20070322/go_fast_admin/ent/adminuser"
-	"github.com/a20070322/go_fast_admin/ent/casbinrules"
 	"github.com/a20070322/go_fast_admin/ent/schema"
 	"github.com/google/uuid"
 )
@@ -94,34 +93,4 @@ func init() {
 	adminuserDescID := adminuserFields[0].Descriptor()
 	// adminuser.DefaultID holds the default value on creation for the id field.
 	adminuser.DefaultID = adminuserDescID.Default.(func() uuid.UUID)
-	casbinrulesFields := schema.CasbinRules{}.Fields()
-	_ = casbinrulesFields
-	// casbinrulesDescPtype is the schema descriptor for ptype field.
-	casbinrulesDescPtype := casbinrulesFields[0].Descriptor()
-	// casbinrules.DefaultPtype holds the default value on creation for the ptype field.
-	casbinrules.DefaultPtype = casbinrulesDescPtype.Default.(string)
-	// casbinrulesDescV0 is the schema descriptor for v0 field.
-	casbinrulesDescV0 := casbinrulesFields[1].Descriptor()
-	// casbinrules.DefaultV0 holds the default value on creation for the v0 field.
-	casbinrules.DefaultV0 = casbinrulesDescV0.Default.(string)
-	// casbinrulesDescV1 is the schema descriptor for v1 field.
-	casbinrulesDescV1 := casbinrulesFields[2].Descriptor()
-	// casbinrules.DefaultV1 holds the default value on creation for the v1 field.
-	casbinrules.DefaultV1 = casbinrulesDescV1.Default.(string)
-	// casbinrulesDescV2 is the schema descriptor for v2 field.
-	casbinrulesDescV2 := casbinrulesFields[3].Descriptor()
-	// casbinrules.DefaultV2 holds the default value on creation for the v2 field.
-	casbinrules.DefaultV2 = casbinrulesDescV2.Default.(string)
-	// casbinrulesDescV3 is the schema descriptor for v3 field.
-	casbinrulesDescV3 := casbinrulesFields[4].Descriptor()
-	// casbinrules.DefaultV3 holds the default value on creation for the v3 field.
-	casbinrules.DefaultV3 = casbinrulesDescV3.Default.(string)
-	// casbinrulesDescV4 is the schema descriptor for v4 field.
-	casbinrulesDescV4 := casbinrulesFields[5].Descriptor()
-	// casbinrules.DefaultV4 holds the default value on creation for the v4 field.
-	casbinrules.DefaultV4 = casbinrulesDescV4.Default.(string)
-	// casbinrulesDescV5 is the schema descriptor for v5 field.
-	casbinrulesDescV5 := casbinrulesFields[6].Descriptor()
-	// casbinrules.DefaultV5 holds the default value on creation for the v5 field.
-	casbinrules.DefaultV5 = casbinrulesDescV5.Default.(string)
 }
