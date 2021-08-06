@@ -18,3 +18,5 @@ config/config.yaml
 .tmp/
 logs/
 .idea/
+gen/config.json
+.DS_Store
