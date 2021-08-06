@@ -94,8 +94,7 @@ func (m *AdminMenus) Update(id int, form *FormUpdate) (rep RepUpdate, err error)
 	if err != nil {
 		return rep, errors.New("user is not find")
 	}
-	db := fup.
-		Update().
+	db := fup.Update().
 		SetName(form.Name).
 		SetPath(form.Path).
 		SetRouterPath(form.RouterPath).
@@ -166,26 +165,26 @@ func (m *AdminMenus) FindById(id int) (rep *ent.AdminMenus, err error) {
 func (m *AdminMenus) GetUserMenu(roleIds []int) (RepGetUserMenu, error) {
 	var rep RepGetUserMenu
 	var menus []*ent.AdminMenus
-	for _,v := range  roleIds {
-	   role,err := cache_service.Init(m.ctx).GetAdminRoleCatch(v)
-	   if err != nil {
-	   	return rep, err
-	   }
-	   if role.IsEnable == true {
-	   		for _,menu := range role.Edges.Menu{
+	for _, v := range roleIds {
+		role, err := cache_service.Init(m.ctx).GetAdminRoleCatch(v)
+		if err != nil {
+			return rep, err
+		}
+		if role.IsEnable == true {
+			for _, menu := range role.Edges.Menu {
 				if menu.IsEnable == true {
 					//目录及菜单
-					if menu.Type == 1 ||menu.Type == 2  {
-						menus = append(menus,menu)
+					if menu.Type == 1 || menu.Type == 2 {
+						menus = append(menus, menu)
 					}
 					//按钮带权限标识
-					if menu.Type == 3  {
-						rep.Role = append(rep.Role,menu)
+					if menu.Type == 3 {
+						rep.Role = append(rep.Role, menu)
 					}
 				}
 			}
 
-	   }
+		}
 	}
 	rep.Menu = MenuToTree(menus, 0, 1)
 	return rep, nil
