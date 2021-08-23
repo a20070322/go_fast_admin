@@ -8,6 +8,51 @@ import (
 )
 
 var (
+	// AdminDictsColumns holds the columns for the "admin_dicts" table.
+	AdminDictsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
+		{Name: "dict_type", Type: field.TypeString, Unique: true},
+		{Name: "dict_name", Type: field.TypeString},
+		{Name: "remarks", Type: field.TypeString},
+		{Name: "is_enable", Type: field.TypeBool},
+	}
+	// AdminDictsTable holds the schema information for the "admin_dicts" table.
+	AdminDictsTable = &schema.Table{
+		Name:        "admin_dicts",
+		Columns:     AdminDictsColumns,
+		PrimaryKey:  []*schema.Column{AdminDictsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{},
+	}
+	// AdminDictKeysColumns holds the columns for the "admin_dict_keys" table.
+	AdminDictKeysColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
+		{Name: "dict_label", Type: field.TypeString},
+		{Name: "dict_code", Type: field.TypeString},
+		{Name: "sort", Type: field.TypeInt, Nullable: true},
+		{Name: "remarks", Type: field.TypeString, Nullable: true},
+		{Name: "is_enable", Type: field.TypeBool},
+		{Name: "admin_dict_key", Type: field.TypeInt, Nullable: true},
+	}
+	// AdminDictKeysTable holds the schema information for the "admin_dict_keys" table.
+	AdminDictKeysTable = &schema.Table{
+		Name:       "admin_dict_keys",
+		Columns:    AdminDictKeysColumns,
+		PrimaryKey: []*schema.Column{AdminDictKeysColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "admin_dict_keys_admin_dicts_key",
+				Columns:    []*schema.Column{AdminDictKeysColumns[9]},
+				RefColumns: []*schema.Column{AdminDictsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
 	// AdminMenusColumns holds the columns for the "admin_menus" table.
 	AdminMenusColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -121,6 +166,8 @@ var (
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		AdminDictsTable,
+		AdminDictKeysTable,
 		AdminMenusTable,
 		AdminRolesTable,
 		AdminUsersTable,
@@ -130,6 +177,7 @@ var (
 )
 
 func init() {
+	AdminDictKeysTable.ForeignKeys[0].RefTable = AdminDictsTable
 	AdminRoleUserTable.ForeignKeys[0].RefTable = AdminRolesTable
 	AdminRoleUserTable.ForeignKeys[1].RefTable = AdminUsersTable
 	AdminRoleMenuTable.ForeignKeys[0].RefTable = AdminRolesTable

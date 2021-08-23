@@ -10,6 +10,7 @@ type FromList struct {
 	Username string `json:"username" form:"username"`
 	Phone    string `json:"phone" form:"phone"`
 	IsEnable string `json:"is_enable" form:"is_enable"`
+	Role     int   `json:"role" form:"role" query:"role"`
 }
 
 type RepList struct {

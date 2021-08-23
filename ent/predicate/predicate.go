@@ -6,6 +6,12 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
+// AdminDict is the predicate function for admindict builders.
+type AdminDict func(*sql.Selector)
+
+// AdminDictKey is the predicate function for admindictkey builders.
+type AdminDictKey func(*sql.Selector)
+
 // AdminMenus is the predicate function for adminmenus builders.
 type AdminMenus func(*sql.Selector)
 

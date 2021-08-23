@@ -14,11 +14,11 @@ type RepList struct {
 	Total int               `json:"total"`
 }
 
-
 type FormCreate struct {
 	Name           string `json:"name" binding:"required"`
 	Path           string `json:"path"`
 	RouterPath     string `json:"router_path"`
+	PathAction         string `json:"path_action"`
 	Icon           string `json:"icon"`
 	Type           int8   `json:"type"`
 	PowerStr       string `json:"power_str"`
@@ -36,6 +36,7 @@ type RepCreate struct {
 type FormUpdate struct {
 	Name           string `json:"name" binding:"required"`
 	Path           string `json:"path"`
+	PathAction         string `json:"path_action"`
 	RouterPath     string `json:"router_path"`
 	Icon           string `json:"icon"`
 	Type           int8   `json:"type"`
@@ -49,14 +50,4 @@ type FormUpdate struct {
 
 type RepUpdate struct {
 	*ent.AdminMenus
-}
-
-type RepGetUserMenu struct {
-	Menu []*MenusTree      `json:"menu"`
-	Role []*ent.AdminMenus `json:"role"`
-}
-
-type MenusTree struct {
-	*ent.AdminMenus
-	Children []*MenusTree `json:"children"`
 }

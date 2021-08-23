@@ -5,6 +5,8 @@ package ent
 import (
 	"time"
 
+	"github.com/a20070322/go_fast_admin/ent/admindict"
+	"github.com/a20070322/go_fast_admin/ent/admindictkey"
 	"github.com/a20070322/go_fast_admin/ent/adminmenus"
 	"github.com/a20070322/go_fast_admin/ent/adminrole"
 	"github.com/a20070322/go_fast_admin/ent/adminuser"
@@ -16,6 +18,32 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	admindictMixin := schema.AdminDict{}.Mixin()
+	admindictMixinFields0 := admindictMixin[0].Fields()
+	_ = admindictMixinFields0
+	admindictFields := schema.AdminDict{}.Fields()
+	_ = admindictFields
+	// admindictDescCreatedAt is the schema descriptor for created_at field.
+	admindictDescCreatedAt := admindictMixinFields0[0].Descriptor()
+	// admindict.DefaultCreatedAt holds the default value on creation for the created_at field.
+	admindict.DefaultCreatedAt = admindictDescCreatedAt.Default.(func() time.Time)
+	// admindictDescUpdatedAt is the schema descriptor for updated_at field.
+	admindictDescUpdatedAt := admindictMixinFields0[1].Descriptor()
+	// admindict.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	admindict.UpdateDefaultUpdatedAt = admindictDescUpdatedAt.UpdateDefault.(func() time.Time)
+	admindictkeyMixin := schema.AdminDictKey{}.Mixin()
+	admindictkeyMixinFields0 := admindictkeyMixin[0].Fields()
+	_ = admindictkeyMixinFields0
+	admindictkeyFields := schema.AdminDictKey{}.Fields()
+	_ = admindictkeyFields
+	// admindictkeyDescCreatedAt is the schema descriptor for created_at field.
+	admindictkeyDescCreatedAt := admindictkeyMixinFields0[0].Descriptor()
+	// admindictkey.DefaultCreatedAt holds the default value on creation for the created_at field.
+	admindictkey.DefaultCreatedAt = admindictkeyDescCreatedAt.Default.(func() time.Time)
+	// admindictkeyDescUpdatedAt is the schema descriptor for updated_at field.
+	admindictkeyDescUpdatedAt := admindictkeyMixinFields0[1].Descriptor()
+	// admindictkey.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	admindictkey.UpdateDefaultUpdatedAt = admindictkeyDescUpdatedAt.UpdateDefault.(func() time.Time)
 	adminmenusMixin := schema.AdminMenus{}.Mixin()
 	adminmenusMixinFields0 := adminmenusMixin[0].Fields()
 	_ = adminmenusMixinFields0

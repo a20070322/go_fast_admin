@@ -49,8 +49,11 @@ func (m *AdminUser) List(form *FromList) (rep RepList, err error) {
 			break
 		}
 	}
+	if form.Role != 0 {
+		whereArr = append(whereArr,adminuser.HasRoleWith(adminrole.IDEQ(form.Role)))
+	}
 	//查询
-	db := m.db.Query().Where(whereArr...).WithRole(func(query *ent.AdminRoleQuery) {
+	db := m.db.Query().Where(whereArr...).WithRole(func(query *ent.AdminRoleQuery){
 		query.Select(adminrole.FieldID, adminrole.FieldName)
 	})
 	//获取总条数
@@ -131,7 +134,7 @@ func (m *AdminUser) Delete(id string) (err error) {
 
 //查找
 func (m *AdminUser) FindById(id string) (rep *ent.AdminUser, err error) {
-	rep, err = m.db.Query().Where(adminuser.IDEQ(uuid.MustParse(id)), adminuser.DeletedAtIsNil()).First(m.ctx)
+	rep, err = m.db.Query().Where(adminuser.IDEQ(uuid.MustParse(id)), adminuser.DeletedAtIsNil()).WithRole().First(m.ctx)
 	if err != nil {
 		return rep, errors.New("user is not find")
 	}

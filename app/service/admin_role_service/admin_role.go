@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/a20070322/go_fast_admin/ent"
+	"github.com/a20070322/go_fast_admin/ent/adminmenus"
 	"github.com/a20070322/go_fast_admin/ent/adminrole"
 	"github.com/a20070322/go_fast_admin/ent/predicate"
 	"github.com/a20070322/go_fast_admin/global"
@@ -122,7 +123,9 @@ func (m *AdminRole) FindById(id int) (rep *ent.AdminRole, err error) {
 }
 
 func (m *AdminRole) FindByIdWithMenu(id int) (rep *ent.AdminRole, err error) {
-	rep, err = m.db.Query().Where(adminrole.IDEQ(id), adminrole.DeletedAtIsNil()).WithMenu().First(m.ctx)
+	rep, err = m.db.Query().Where(adminrole.IDEQ(id), adminrole.DeletedAtIsNil()).WithMenu(func(query *ent.AdminMenusQuery) {
+		query.Where(adminmenus.DeletedAtIsNil())
+	}).First(m.ctx)
 	if err != nil {
 		return rep, errors.New("user is not find")
 	}

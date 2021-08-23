@@ -5,7 +5,6 @@ go 1.16
 require (
 	entgo.io/ent v0.8.0
 	github.com/casbin/casbin/v2 v2.34.1
-	github.com/casbin/ent-adapter v0.2.1
 	github.com/cjrd/allocate v0.0.0-20191115010018-022b87fe59fc
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-gonic/gin v1.7.2

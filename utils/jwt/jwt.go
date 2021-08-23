@@ -26,7 +26,7 @@ func GetTokenId(ctx *gin.Context) (string, error) {
 
 type Claims struct {
 	jwt.StandardClaims
-	UserID         string           `json:"user_id"`
+	UserID         string        `json:"user_id"`
 	UserGroup      UserGroupType `json:"user_group"`
 	IsRefreshToken bool          `json:"is_refresh_token"`
 }
@@ -72,7 +72,7 @@ func GenToken(claims *Claims) (*AuthReturn, error) {
 	refreshClaims := &Claims{
 		StandardClaims: jwt.StandardClaims{
 			IssuedAt:  time.Now().Unix(),
-			ExpiresAt: claims.ExpiresAt + (86400 * 7),
+			ExpiresAt: claims.ExpiresAt + (86400 * 7 * 1000),
 		},
 		UserID:         claims.UserID,
 		UserGroup:      claims.UserGroup,

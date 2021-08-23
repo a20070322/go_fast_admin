@@ -9,6 +9,32 @@ import (
 	"github.com/a20070322/go_fast_admin/ent"
 )
 
+// The AdminDictFunc type is an adapter to allow the use of ordinary
+// function as AdminDict mutator.
+type AdminDictFunc func(context.Context, *ent.AdminDictMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f AdminDictFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.AdminDictMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AdminDictMutation", m)
+	}
+	return f(ctx, mv)
+}
+
+// The AdminDictKeyFunc type is an adapter to allow the use of ordinary
+// function as AdminDictKey mutator.
+type AdminDictKeyFunc func(context.Context, *ent.AdminDictKeyMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f AdminDictKeyFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.AdminDictKeyMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AdminDictKeyMutation", m)
+	}
+	return f(ctx, mv)
+}
+
 // The AdminMenusFunc type is an adapter to allow the use of ordinary
 // function as AdminMenus mutator.
 type AdminMenusFunc func(context.Context, *ent.AdminMenusMutation) (ent.Value, error)

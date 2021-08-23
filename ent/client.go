@@ -10,6 +10,8 @@ import (
 	"github.com/a20070322/go_fast_admin/ent/migrate"
 	"github.com/google/uuid"
 
+	"github.com/a20070322/go_fast_admin/ent/admindict"
+	"github.com/a20070322/go_fast_admin/ent/admindictkey"
 	"github.com/a20070322/go_fast_admin/ent/adminmenus"
 	"github.com/a20070322/go_fast_admin/ent/adminrole"
 	"github.com/a20070322/go_fast_admin/ent/adminuser"
@@ -24,6 +26,10 @@ type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
 	Schema *migrate.Schema
+	// AdminDict is the client for interacting with the AdminDict builders.
+	AdminDict *AdminDictClient
+	// AdminDictKey is the client for interacting with the AdminDictKey builders.
+	AdminDictKey *AdminDictKeyClient
 	// AdminMenus is the client for interacting with the AdminMenus builders.
 	AdminMenus *AdminMenusClient
 	// AdminRole is the client for interacting with the AdminRole builders.
@@ -43,6 +49,8 @@ func NewClient(opts ...Option) *Client {
 
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
+	c.AdminDict = NewAdminDictClient(c.config)
+	c.AdminDictKey = NewAdminDictKeyClient(c.config)
 	c.AdminMenus = NewAdminMenusClient(c.config)
 	c.AdminRole = NewAdminRoleClient(c.config)
 	c.AdminUser = NewAdminUserClient(c.config)
@@ -77,11 +85,13 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:        ctx,
-		config:     cfg,
-		AdminMenus: NewAdminMenusClient(cfg),
-		AdminRole:  NewAdminRoleClient(cfg),
-		AdminUser:  NewAdminUserClient(cfg),
+		ctx:          ctx,
+		config:       cfg,
+		AdminDict:    NewAdminDictClient(cfg),
+		AdminDictKey: NewAdminDictKeyClient(cfg),
+		AdminMenus:   NewAdminMenusClient(cfg),
+		AdminRole:    NewAdminRoleClient(cfg),
+		AdminUser:    NewAdminUserClient(cfg),
 	}, nil
 }
 
@@ -99,17 +109,19 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		config:     cfg,
-		AdminMenus: NewAdminMenusClient(cfg),
-		AdminRole:  NewAdminRoleClient(cfg),
-		AdminUser:  NewAdminUserClient(cfg),
+		config:       cfg,
+		AdminDict:    NewAdminDictClient(cfg),
+		AdminDictKey: NewAdminDictKeyClient(cfg),
+		AdminMenus:   NewAdminMenusClient(cfg),
+		AdminRole:    NewAdminRoleClient(cfg),
+		AdminUser:    NewAdminUserClient(cfg),
 	}, nil
 }
 
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		AdminMenus.
+//		AdminDict.
 //		Query().
 //		Count(ctx)
 //
@@ -132,9 +144,223 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
+	c.AdminDict.Use(hooks...)
+	c.AdminDictKey.Use(hooks...)
 	c.AdminMenus.Use(hooks...)
 	c.AdminRole.Use(hooks...)
 	c.AdminUser.Use(hooks...)
+}
+
+// AdminDictClient is a client for the AdminDict schema.
+type AdminDictClient struct {
+	config
+}
+
+// NewAdminDictClient returns a client for the AdminDict from the given config.
+func NewAdminDictClient(c config) *AdminDictClient {
+	return &AdminDictClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `admindict.Hooks(f(g(h())))`.
+func (c *AdminDictClient) Use(hooks ...Hook) {
+	c.hooks.AdminDict = append(c.hooks.AdminDict, hooks...)
+}
+
+// Create returns a create builder for AdminDict.
+func (c *AdminDictClient) Create() *AdminDictCreate {
+	mutation := newAdminDictMutation(c.config, OpCreate)
+	return &AdminDictCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of AdminDict entities.
+func (c *AdminDictClient) CreateBulk(builders ...*AdminDictCreate) *AdminDictCreateBulk {
+	return &AdminDictCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for AdminDict.
+func (c *AdminDictClient) Update() *AdminDictUpdate {
+	mutation := newAdminDictMutation(c.config, OpUpdate)
+	return &AdminDictUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *AdminDictClient) UpdateOne(ad *AdminDict) *AdminDictUpdateOne {
+	mutation := newAdminDictMutation(c.config, OpUpdateOne, withAdminDict(ad))
+	return &AdminDictUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *AdminDictClient) UpdateOneID(id int) *AdminDictUpdateOne {
+	mutation := newAdminDictMutation(c.config, OpUpdateOne, withAdminDictID(id))
+	return &AdminDictUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for AdminDict.
+func (c *AdminDictClient) Delete() *AdminDictDelete {
+	mutation := newAdminDictMutation(c.config, OpDelete)
+	return &AdminDictDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *AdminDictClient) DeleteOne(ad *AdminDict) *AdminDictDeleteOne {
+	return c.DeleteOneID(ad.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *AdminDictClient) DeleteOneID(id int) *AdminDictDeleteOne {
+	builder := c.Delete().Where(admindict.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &AdminDictDeleteOne{builder}
+}
+
+// Query returns a query builder for AdminDict.
+func (c *AdminDictClient) Query() *AdminDictQuery {
+	return &AdminDictQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a AdminDict entity by its id.
+func (c *AdminDictClient) Get(ctx context.Context, id int) (*AdminDict, error) {
+	return c.Query().Where(admindict.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *AdminDictClient) GetX(ctx context.Context, id int) *AdminDict {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryKey queries the key edge of a AdminDict.
+func (c *AdminDictClient) QueryKey(ad *AdminDict) *AdminDictKeyQuery {
+	query := &AdminDictKeyQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := ad.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(admindict.Table, admindict.FieldID, id),
+			sqlgraph.To(admindictkey.Table, admindictkey.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, admindict.KeyTable, admindict.KeyColumn),
+		)
+		fromV = sqlgraph.Neighbors(ad.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *AdminDictClient) Hooks() []Hook {
+	return c.hooks.AdminDict
+}
+
+// AdminDictKeyClient is a client for the AdminDictKey schema.
+type AdminDictKeyClient struct {
+	config
+}
+
+// NewAdminDictKeyClient returns a client for the AdminDictKey from the given config.
+func NewAdminDictKeyClient(c config) *AdminDictKeyClient {
+	return &AdminDictKeyClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `admindictkey.Hooks(f(g(h())))`.
+func (c *AdminDictKeyClient) Use(hooks ...Hook) {
+	c.hooks.AdminDictKey = append(c.hooks.AdminDictKey, hooks...)
+}
+
+// Create returns a create builder for AdminDictKey.
+func (c *AdminDictKeyClient) Create() *AdminDictKeyCreate {
+	mutation := newAdminDictKeyMutation(c.config, OpCreate)
+	return &AdminDictKeyCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of AdminDictKey entities.
+func (c *AdminDictKeyClient) CreateBulk(builders ...*AdminDictKeyCreate) *AdminDictKeyCreateBulk {
+	return &AdminDictKeyCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for AdminDictKey.
+func (c *AdminDictKeyClient) Update() *AdminDictKeyUpdate {
+	mutation := newAdminDictKeyMutation(c.config, OpUpdate)
+	return &AdminDictKeyUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *AdminDictKeyClient) UpdateOne(adk *AdminDictKey) *AdminDictKeyUpdateOne {
+	mutation := newAdminDictKeyMutation(c.config, OpUpdateOne, withAdminDictKey(adk))
+	return &AdminDictKeyUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *AdminDictKeyClient) UpdateOneID(id int) *AdminDictKeyUpdateOne {
+	mutation := newAdminDictKeyMutation(c.config, OpUpdateOne, withAdminDictKeyID(id))
+	return &AdminDictKeyUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for AdminDictKey.
+func (c *AdminDictKeyClient) Delete() *AdminDictKeyDelete {
+	mutation := newAdminDictKeyMutation(c.config, OpDelete)
+	return &AdminDictKeyDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *AdminDictKeyClient) DeleteOne(adk *AdminDictKey) *AdminDictKeyDeleteOne {
+	return c.DeleteOneID(adk.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *AdminDictKeyClient) DeleteOneID(id int) *AdminDictKeyDeleteOne {
+	builder := c.Delete().Where(admindictkey.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &AdminDictKeyDeleteOne{builder}
+}
+
+// Query returns a query builder for AdminDictKey.
+func (c *AdminDictKeyClient) Query() *AdminDictKeyQuery {
+	return &AdminDictKeyQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a AdminDictKey entity by its id.
+func (c *AdminDictKeyClient) Get(ctx context.Context, id int) (*AdminDictKey, error) {
+	return c.Query().Where(admindictkey.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *AdminDictKeyClient) GetX(ctx context.Context, id int) *AdminDictKey {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryP queries the P edge of a AdminDictKey.
+func (c *AdminDictKeyClient) QueryP(adk *AdminDictKey) *AdminDictQuery {
+	query := &AdminDictQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := adk.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(admindictkey.Table, admindictkey.FieldID, id),
+			sqlgraph.To(admindict.Table, admindict.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, admindictkey.PTable, admindictkey.PColumn),
+		)
+		fromV = sqlgraph.Neighbors(adk.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *AdminDictKeyClient) Hooks() []Hook {
+	return c.hooks.AdminDictKey
 }
 
 // AdminMenusClient is a client for the AdminMenus schema.

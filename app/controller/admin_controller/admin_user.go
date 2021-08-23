@@ -14,6 +14,9 @@ type AdminUser struct {
 
 
 func (c AdminUser) List(ctx *gin.Context) {
+	//fmt.Println("begin")
+	//time.Sleep(time.Duration(2)*time.Second)
+	//fmt.Println("end")
 	var form admin_user_service.FromList
 	if err := ctx.ShouldBind(&form); err != nil {
 		response.Fail(ctx, http.StatusUnprocessableEntity, err.Error(), nil)

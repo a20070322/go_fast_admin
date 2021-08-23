@@ -8,6 +8,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/a20070322/go_fast_admin/ent/admindict"
+	"github.com/a20070322/go_fast_admin/ent/admindictkey"
 	"github.com/a20070322/go_fast_admin/ent/adminmenus"
 	"github.com/a20070322/go_fast_admin/ent/adminrole"
 	"github.com/a20070322/go_fast_admin/ent/adminuser"
@@ -26,10 +28,1606 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
-	TypeAdminMenus = "AdminMenus"
-	TypeAdminRole  = "AdminRole"
-	TypeAdminUser  = "AdminUser"
+	TypeAdminDict    = "AdminDict"
+	TypeAdminDictKey = "AdminDictKey"
+	TypeAdminMenus   = "AdminMenus"
+	TypeAdminRole    = "AdminRole"
+	TypeAdminUser    = "AdminUser"
 )
+
+// AdminDictMutation represents an operation that mutates the AdminDict nodes in the graph.
+type AdminDictMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *int
+	created_at    *time.Time
+	updated_at    *time.Time
+	deleted_at    *time.Time
+	dict_type     *string
+	dict_name     *string
+	remarks       *string
+	is_enable     *bool
+	clearedFields map[string]struct{}
+	key           map[int]struct{}
+	removedkey    map[int]struct{}
+	clearedkey    bool
+	done          bool
+	oldValue      func(context.Context) (*AdminDict, error)
+	predicates    []predicate.AdminDict
+}
+
+var _ ent.Mutation = (*AdminDictMutation)(nil)
+
+// admindictOption allows management of the mutation configuration using functional options.
+type admindictOption func(*AdminDictMutation)
+
+// newAdminDictMutation creates new mutation for the AdminDict entity.
+func newAdminDictMutation(c config, op Op, opts ...admindictOption) *AdminDictMutation {
+	m := &AdminDictMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeAdminDict,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withAdminDictID sets the ID field of the mutation.
+func withAdminDictID(id int) admindictOption {
+	return func(m *AdminDictMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *AdminDict
+		)
+		m.oldValue = func(ctx context.Context) (*AdminDict, error) {
+			once.Do(func() {
+				if m.done {
+					err = fmt.Errorf("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().AdminDict.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withAdminDict sets the old AdminDict of the mutation.
+func withAdminDict(node *AdminDict) admindictOption {
+	return func(m *AdminDictMutation) {
+		m.oldValue = func(context.Context) (*AdminDict, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m AdminDictMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m AdminDictMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, fmt.Errorf("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID
+// is only available if it was provided to the builder.
+func (m *AdminDictMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *AdminDictMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *AdminDictMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the AdminDict entity.
+// If the AdminDict object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AdminDictMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *AdminDictMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *AdminDictMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *AdminDictMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the AdminDict entity.
+// If the AdminDict object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AdminDictMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ClearUpdatedAt clears the value of the "updated_at" field.
+func (m *AdminDictMutation) ClearUpdatedAt() {
+	m.updated_at = nil
+	m.clearedFields[admindict.FieldUpdatedAt] = struct{}{}
+}
+
+// UpdatedAtCleared returns if the "updated_at" field was cleared in this mutation.
+func (m *AdminDictMutation) UpdatedAtCleared() bool {
+	_, ok := m.clearedFields[admindict.FieldUpdatedAt]
+	return ok
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *AdminDictMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+	delete(m.clearedFields, admindict.FieldUpdatedAt)
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (m *AdminDictMutation) SetDeletedAt(t time.Time) {
+	m.deleted_at = &t
+}
+
+// DeletedAt returns the value of the "deleted_at" field in the mutation.
+func (m *AdminDictMutation) DeletedAt() (r time.Time, exists bool) {
+	v := m.deleted_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeletedAt returns the old "deleted_at" field's value of the AdminDict entity.
+// If the AdminDict object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AdminDictMutation) OldDeletedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldDeletedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldDeletedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeletedAt: %w", err)
+	}
+	return oldValue.DeletedAt, nil
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (m *AdminDictMutation) ClearDeletedAt() {
+	m.deleted_at = nil
+	m.clearedFields[admindict.FieldDeletedAt] = struct{}{}
+}
+
+// DeletedAtCleared returns if the "deleted_at" field was cleared in this mutation.
+func (m *AdminDictMutation) DeletedAtCleared() bool {
+	_, ok := m.clearedFields[admindict.FieldDeletedAt]
+	return ok
+}
+
+// ResetDeletedAt resets all changes to the "deleted_at" field.
+func (m *AdminDictMutation) ResetDeletedAt() {
+	m.deleted_at = nil
+	delete(m.clearedFields, admindict.FieldDeletedAt)
+}
+
+// SetDictType sets the "dict_type" field.
+func (m *AdminDictMutation) SetDictType(s string) {
+	m.dict_type = &s
+}
+
+// DictType returns the value of the "dict_type" field in the mutation.
+func (m *AdminDictMutation) DictType() (r string, exists bool) {
+	v := m.dict_type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDictType returns the old "dict_type" field's value of the AdminDict entity.
+// If the AdminDict object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AdminDictMutation) OldDictType(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldDictType is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldDictType requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDictType: %w", err)
+	}
+	return oldValue.DictType, nil
+}
+
+// ResetDictType resets all changes to the "dict_type" field.
+func (m *AdminDictMutation) ResetDictType() {
+	m.dict_type = nil
+}
+
+// SetDictName sets the "dict_name" field.
+func (m *AdminDictMutation) SetDictName(s string) {
+	m.dict_name = &s
+}
+
+// DictName returns the value of the "dict_name" field in the mutation.
+func (m *AdminDictMutation) DictName() (r string, exists bool) {
+	v := m.dict_name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDictName returns the old "dict_name" field's value of the AdminDict entity.
+// If the AdminDict object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AdminDictMutation) OldDictName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldDictName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldDictName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDictName: %w", err)
+	}
+	return oldValue.DictName, nil
+}
+
+// ResetDictName resets all changes to the "dict_name" field.
+func (m *AdminDictMutation) ResetDictName() {
+	m.dict_name = nil
+}
+
+// SetRemarks sets the "remarks" field.
+func (m *AdminDictMutation) SetRemarks(s string) {
+	m.remarks = &s
+}
+
+// Remarks returns the value of the "remarks" field in the mutation.
+func (m *AdminDictMutation) Remarks() (r string, exists bool) {
+	v := m.remarks
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRemarks returns the old "remarks" field's value of the AdminDict entity.
+// If the AdminDict object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AdminDictMutation) OldRemarks(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldRemarks is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldRemarks requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRemarks: %w", err)
+	}
+	return oldValue.Remarks, nil
+}
+
+// ResetRemarks resets all changes to the "remarks" field.
+func (m *AdminDictMutation) ResetRemarks() {
+	m.remarks = nil
+}
+
+// SetIsEnable sets the "is_enable" field.
+func (m *AdminDictMutation) SetIsEnable(b bool) {
+	m.is_enable = &b
+}
+
+// IsEnable returns the value of the "is_enable" field in the mutation.
+func (m *AdminDictMutation) IsEnable() (r bool, exists bool) {
+	v := m.is_enable
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldIsEnable returns the old "is_enable" field's value of the AdminDict entity.
+// If the AdminDict object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AdminDictMutation) OldIsEnable(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldIsEnable is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldIsEnable requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldIsEnable: %w", err)
+	}
+	return oldValue.IsEnable, nil
+}
+
+// ResetIsEnable resets all changes to the "is_enable" field.
+func (m *AdminDictMutation) ResetIsEnable() {
+	m.is_enable = nil
+}
+
+// AddKeyIDs adds the "key" edge to the AdminDictKey entity by ids.
+func (m *AdminDictMutation) AddKeyIDs(ids ...int) {
+	if m.key == nil {
+		m.key = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.key[ids[i]] = struct{}{}
+	}
+}
+
+// ClearKey clears the "key" edge to the AdminDictKey entity.
+func (m *AdminDictMutation) ClearKey() {
+	m.clearedkey = true
+}
+
+// KeyCleared reports if the "key" edge to the AdminDictKey entity was cleared.
+func (m *AdminDictMutation) KeyCleared() bool {
+	return m.clearedkey
+}
+
+// RemoveKeyIDs removes the "key" edge to the AdminDictKey entity by IDs.
+func (m *AdminDictMutation) RemoveKeyIDs(ids ...int) {
+	if m.removedkey == nil {
+		m.removedkey = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.removedkey[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedKey returns the removed IDs of the "key" edge to the AdminDictKey entity.
+func (m *AdminDictMutation) RemovedKeyIDs() (ids []int) {
+	for id := range m.removedkey {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// KeyIDs returns the "key" edge IDs in the mutation.
+func (m *AdminDictMutation) KeyIDs() (ids []int) {
+	for id := range m.key {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetKey resets all changes to the "key" edge.
+func (m *AdminDictMutation) ResetKey() {
+	m.key = nil
+	m.clearedkey = false
+	m.removedkey = nil
+}
+
+// Op returns the operation name.
+func (m *AdminDictMutation) Op() Op {
+	return m.op
+}
+
+// Type returns the node type of this mutation (AdminDict).
+func (m *AdminDictMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *AdminDictMutation) Fields() []string {
+	fields := make([]string, 0, 7)
+	if m.created_at != nil {
+		fields = append(fields, admindict.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, admindict.FieldUpdatedAt)
+	}
+	if m.deleted_at != nil {
+		fields = append(fields, admindict.FieldDeletedAt)
+	}
+	if m.dict_type != nil {
+		fields = append(fields, admindict.FieldDictType)
+	}
+	if m.dict_name != nil {
+		fields = append(fields, admindict.FieldDictName)
+	}
+	if m.remarks != nil {
+		fields = append(fields, admindict.FieldRemarks)
+	}
+	if m.is_enable != nil {
+		fields = append(fields, admindict.FieldIsEnable)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *AdminDictMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case admindict.FieldCreatedAt:
+		return m.CreatedAt()
+	case admindict.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case admindict.FieldDeletedAt:
+		return m.DeletedAt()
+	case admindict.FieldDictType:
+		return m.DictType()
+	case admindict.FieldDictName:
+		return m.DictName()
+	case admindict.FieldRemarks:
+		return m.Remarks()
+	case admindict.FieldIsEnable:
+		return m.IsEnable()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *AdminDictMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case admindict.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case admindict.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case admindict.FieldDeletedAt:
+		return m.OldDeletedAt(ctx)
+	case admindict.FieldDictType:
+		return m.OldDictType(ctx)
+	case admindict.FieldDictName:
+		return m.OldDictName(ctx)
+	case admindict.FieldRemarks:
+		return m.OldRemarks(ctx)
+	case admindict.FieldIsEnable:
+		return m.OldIsEnable(ctx)
+	}
+	return nil, fmt.Errorf("unknown AdminDict field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *AdminDictMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case admindict.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case admindict.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case admindict.FieldDeletedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeletedAt(v)
+		return nil
+	case admindict.FieldDictType:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDictType(v)
+		return nil
+	case admindict.FieldDictName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDictName(v)
+		return nil
+	case admindict.FieldRemarks:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRemarks(v)
+		return nil
+	case admindict.FieldIsEnable:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIsEnable(v)
+		return nil
+	}
+	return fmt.Errorf("unknown AdminDict field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *AdminDictMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *AdminDictMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *AdminDictMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown AdminDict numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *AdminDictMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(admindict.FieldUpdatedAt) {
+		fields = append(fields, admindict.FieldUpdatedAt)
+	}
+	if m.FieldCleared(admindict.FieldDeletedAt) {
+		fields = append(fields, admindict.FieldDeletedAt)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *AdminDictMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *AdminDictMutation) ClearField(name string) error {
+	switch name {
+	case admindict.FieldUpdatedAt:
+		m.ClearUpdatedAt()
+		return nil
+	case admindict.FieldDeletedAt:
+		m.ClearDeletedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown AdminDict nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *AdminDictMutation) ResetField(name string) error {
+	switch name {
+	case admindict.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case admindict.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case admindict.FieldDeletedAt:
+		m.ResetDeletedAt()
+		return nil
+	case admindict.FieldDictType:
+		m.ResetDictType()
+		return nil
+	case admindict.FieldDictName:
+		m.ResetDictName()
+		return nil
+	case admindict.FieldRemarks:
+		m.ResetRemarks()
+		return nil
+	case admindict.FieldIsEnable:
+		m.ResetIsEnable()
+		return nil
+	}
+	return fmt.Errorf("unknown AdminDict field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *AdminDictMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.key != nil {
+		edges = append(edges, admindict.EdgeKey)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *AdminDictMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case admindict.EdgeKey:
+		ids := make([]ent.Value, 0, len(m.key))
+		for id := range m.key {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *AdminDictMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.removedkey != nil {
+		edges = append(edges, admindict.EdgeKey)
+	}
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *AdminDictMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case admindict.EdgeKey:
+		ids := make([]ent.Value, 0, len(m.removedkey))
+		for id := range m.removedkey {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *AdminDictMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.clearedkey {
+		edges = append(edges, admindict.EdgeKey)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *AdminDictMutation) EdgeCleared(name string) bool {
+	switch name {
+	case admindict.EdgeKey:
+		return m.clearedkey
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *AdminDictMutation) ClearEdge(name string) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown AdminDict unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *AdminDictMutation) ResetEdge(name string) error {
+	switch name {
+	case admindict.EdgeKey:
+		m.ResetKey()
+		return nil
+	}
+	return fmt.Errorf("unknown AdminDict edge %s", name)
+}
+
+// AdminDictKeyMutation represents an operation that mutates the AdminDictKey nodes in the graph.
+type AdminDictKeyMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *int
+	created_at    *time.Time
+	updated_at    *time.Time
+	deleted_at    *time.Time
+	dict_label    *string
+	dict_code     *string
+	sort          *int
+	addsort       *int
+	remarks       *string
+	is_enable     *bool
+	clearedFields map[string]struct{}
+	_P            *int
+	cleared_P     bool
+	done          bool
+	oldValue      func(context.Context) (*AdminDictKey, error)
+	predicates    []predicate.AdminDictKey
+}
+
+var _ ent.Mutation = (*AdminDictKeyMutation)(nil)
+
+// admindictkeyOption allows management of the mutation configuration using functional options.
+type admindictkeyOption func(*AdminDictKeyMutation)
+
+// newAdminDictKeyMutation creates new mutation for the AdminDictKey entity.
+func newAdminDictKeyMutation(c config, op Op, opts ...admindictkeyOption) *AdminDictKeyMutation {
+	m := &AdminDictKeyMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeAdminDictKey,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withAdminDictKeyID sets the ID field of the mutation.
+func withAdminDictKeyID(id int) admindictkeyOption {
+	return func(m *AdminDictKeyMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *AdminDictKey
+		)
+		m.oldValue = func(ctx context.Context) (*AdminDictKey, error) {
+			once.Do(func() {
+				if m.done {
+					err = fmt.Errorf("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().AdminDictKey.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withAdminDictKey sets the old AdminDictKey of the mutation.
+func withAdminDictKey(node *AdminDictKey) admindictkeyOption {
+	return func(m *AdminDictKeyMutation) {
+		m.oldValue = func(context.Context) (*AdminDictKey, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m AdminDictKeyMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m AdminDictKeyMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, fmt.Errorf("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID
+// is only available if it was provided to the builder.
+func (m *AdminDictKeyMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *AdminDictKeyMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *AdminDictKeyMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the AdminDictKey entity.
+// If the AdminDictKey object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AdminDictKeyMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *AdminDictKeyMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *AdminDictKeyMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *AdminDictKeyMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the AdminDictKey entity.
+// If the AdminDictKey object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AdminDictKeyMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ClearUpdatedAt clears the value of the "updated_at" field.
+func (m *AdminDictKeyMutation) ClearUpdatedAt() {
+	m.updated_at = nil
+	m.clearedFields[admindictkey.FieldUpdatedAt] = struct{}{}
+}
+
+// UpdatedAtCleared returns if the "updated_at" field was cleared in this mutation.
+func (m *AdminDictKeyMutation) UpdatedAtCleared() bool {
+	_, ok := m.clearedFields[admindictkey.FieldUpdatedAt]
+	return ok
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *AdminDictKeyMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+	delete(m.clearedFields, admindictkey.FieldUpdatedAt)
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (m *AdminDictKeyMutation) SetDeletedAt(t time.Time) {
+	m.deleted_at = &t
+}
+
+// DeletedAt returns the value of the "deleted_at" field in the mutation.
+func (m *AdminDictKeyMutation) DeletedAt() (r time.Time, exists bool) {
+	v := m.deleted_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeletedAt returns the old "deleted_at" field's value of the AdminDictKey entity.
+// If the AdminDictKey object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AdminDictKeyMutation) OldDeletedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldDeletedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldDeletedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeletedAt: %w", err)
+	}
+	return oldValue.DeletedAt, nil
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (m *AdminDictKeyMutation) ClearDeletedAt() {
+	m.deleted_at = nil
+	m.clearedFields[admindictkey.FieldDeletedAt] = struct{}{}
+}
+
+// DeletedAtCleared returns if the "deleted_at" field was cleared in this mutation.
+func (m *AdminDictKeyMutation) DeletedAtCleared() bool {
+	_, ok := m.clearedFields[admindictkey.FieldDeletedAt]
+	return ok
+}
+
+// ResetDeletedAt resets all changes to the "deleted_at" field.
+func (m *AdminDictKeyMutation) ResetDeletedAt() {
+	m.deleted_at = nil
+	delete(m.clearedFields, admindictkey.FieldDeletedAt)
+}
+
+// SetDictLabel sets the "dict_label" field.
+func (m *AdminDictKeyMutation) SetDictLabel(s string) {
+	m.dict_label = &s
+}
+
+// DictLabel returns the value of the "dict_label" field in the mutation.
+func (m *AdminDictKeyMutation) DictLabel() (r string, exists bool) {
+	v := m.dict_label
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDictLabel returns the old "dict_label" field's value of the AdminDictKey entity.
+// If the AdminDictKey object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AdminDictKeyMutation) OldDictLabel(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldDictLabel is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldDictLabel requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDictLabel: %w", err)
+	}
+	return oldValue.DictLabel, nil
+}
+
+// ResetDictLabel resets all changes to the "dict_label" field.
+func (m *AdminDictKeyMutation) ResetDictLabel() {
+	m.dict_label = nil
+}
+
+// SetDictCode sets the "dict_code" field.
+func (m *AdminDictKeyMutation) SetDictCode(s string) {
+	m.dict_code = &s
+}
+
+// DictCode returns the value of the "dict_code" field in the mutation.
+func (m *AdminDictKeyMutation) DictCode() (r string, exists bool) {
+	v := m.dict_code
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDictCode returns the old "dict_code" field's value of the AdminDictKey entity.
+// If the AdminDictKey object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AdminDictKeyMutation) OldDictCode(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldDictCode is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldDictCode requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDictCode: %w", err)
+	}
+	return oldValue.DictCode, nil
+}
+
+// ResetDictCode resets all changes to the "dict_code" field.
+func (m *AdminDictKeyMutation) ResetDictCode() {
+	m.dict_code = nil
+}
+
+// SetSort sets the "sort" field.
+func (m *AdminDictKeyMutation) SetSort(i int) {
+	m.sort = &i
+	m.addsort = nil
+}
+
+// Sort returns the value of the "sort" field in the mutation.
+func (m *AdminDictKeyMutation) Sort() (r int, exists bool) {
+	v := m.sort
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSort returns the old "sort" field's value of the AdminDictKey entity.
+// If the AdminDictKey object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AdminDictKeyMutation) OldSort(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldSort is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldSort requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSort: %w", err)
+	}
+	return oldValue.Sort, nil
+}
+
+// AddSort adds i to the "sort" field.
+func (m *AdminDictKeyMutation) AddSort(i int) {
+	if m.addsort != nil {
+		*m.addsort += i
+	} else {
+		m.addsort = &i
+	}
+}
+
+// AddedSort returns the value that was added to the "sort" field in this mutation.
+func (m *AdminDictKeyMutation) AddedSort() (r int, exists bool) {
+	v := m.addsort
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearSort clears the value of the "sort" field.
+func (m *AdminDictKeyMutation) ClearSort() {
+	m.sort = nil
+	m.addsort = nil
+	m.clearedFields[admindictkey.FieldSort] = struct{}{}
+}
+
+// SortCleared returns if the "sort" field was cleared in this mutation.
+func (m *AdminDictKeyMutation) SortCleared() bool {
+	_, ok := m.clearedFields[admindictkey.FieldSort]
+	return ok
+}
+
+// ResetSort resets all changes to the "sort" field.
+func (m *AdminDictKeyMutation) ResetSort() {
+	m.sort = nil
+	m.addsort = nil
+	delete(m.clearedFields, admindictkey.FieldSort)
+}
+
+// SetRemarks sets the "remarks" field.
+func (m *AdminDictKeyMutation) SetRemarks(s string) {
+	m.remarks = &s
+}
+
+// Remarks returns the value of the "remarks" field in the mutation.
+func (m *AdminDictKeyMutation) Remarks() (r string, exists bool) {
+	v := m.remarks
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRemarks returns the old "remarks" field's value of the AdminDictKey entity.
+// If the AdminDictKey object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AdminDictKeyMutation) OldRemarks(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldRemarks is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldRemarks requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRemarks: %w", err)
+	}
+	return oldValue.Remarks, nil
+}
+
+// ClearRemarks clears the value of the "remarks" field.
+func (m *AdminDictKeyMutation) ClearRemarks() {
+	m.remarks = nil
+	m.clearedFields[admindictkey.FieldRemarks] = struct{}{}
+}
+
+// RemarksCleared returns if the "remarks" field was cleared in this mutation.
+func (m *AdminDictKeyMutation) RemarksCleared() bool {
+	_, ok := m.clearedFields[admindictkey.FieldRemarks]
+	return ok
+}
+
+// ResetRemarks resets all changes to the "remarks" field.
+func (m *AdminDictKeyMutation) ResetRemarks() {
+	m.remarks = nil
+	delete(m.clearedFields, admindictkey.FieldRemarks)
+}
+
+// SetIsEnable sets the "is_enable" field.
+func (m *AdminDictKeyMutation) SetIsEnable(b bool) {
+	m.is_enable = &b
+}
+
+// IsEnable returns the value of the "is_enable" field in the mutation.
+func (m *AdminDictKeyMutation) IsEnable() (r bool, exists bool) {
+	v := m.is_enable
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldIsEnable returns the old "is_enable" field's value of the AdminDictKey entity.
+// If the AdminDictKey object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AdminDictKeyMutation) OldIsEnable(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldIsEnable is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldIsEnable requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldIsEnable: %w", err)
+	}
+	return oldValue.IsEnable, nil
+}
+
+// ResetIsEnable resets all changes to the "is_enable" field.
+func (m *AdminDictKeyMutation) ResetIsEnable() {
+	m.is_enable = nil
+}
+
+// SetPID sets the "P" edge to the AdminDict entity by id.
+func (m *AdminDictKeyMutation) SetPID(id int) {
+	m._P = &id
+}
+
+// ClearP clears the "P" edge to the AdminDict entity.
+func (m *AdminDictKeyMutation) ClearP() {
+	m.cleared_P = true
+}
+
+// PCleared reports if the "P" edge to the AdminDict entity was cleared.
+func (m *AdminDictKeyMutation) PCleared() bool {
+	return m.cleared_P
+}
+
+// PID returns the "P" edge ID in the mutation.
+func (m *AdminDictKeyMutation) PID() (id int, exists bool) {
+	if m._P != nil {
+		return *m._P, true
+	}
+	return
+}
+
+// PIDs returns the "P" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// PID instead. It exists only for internal usage by the builders.
+func (m *AdminDictKeyMutation) PIDs() (ids []int) {
+	if id := m._P; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetP resets all changes to the "P" edge.
+func (m *AdminDictKeyMutation) ResetP() {
+	m._P = nil
+	m.cleared_P = false
+}
+
+// Op returns the operation name.
+func (m *AdminDictKeyMutation) Op() Op {
+	return m.op
+}
+
+// Type returns the node type of this mutation (AdminDictKey).
+func (m *AdminDictKeyMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *AdminDictKeyMutation) Fields() []string {
+	fields := make([]string, 0, 8)
+	if m.created_at != nil {
+		fields = append(fields, admindictkey.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, admindictkey.FieldUpdatedAt)
+	}
+	if m.deleted_at != nil {
+		fields = append(fields, admindictkey.FieldDeletedAt)
+	}
+	if m.dict_label != nil {
+		fields = append(fields, admindictkey.FieldDictLabel)
+	}
+	if m.dict_code != nil {
+		fields = append(fields, admindictkey.FieldDictCode)
+	}
+	if m.sort != nil {
+		fields = append(fields, admindictkey.FieldSort)
+	}
+	if m.remarks != nil {
+		fields = append(fields, admindictkey.FieldRemarks)
+	}
+	if m.is_enable != nil {
+		fields = append(fields, admindictkey.FieldIsEnable)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *AdminDictKeyMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case admindictkey.FieldCreatedAt:
+		return m.CreatedAt()
+	case admindictkey.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case admindictkey.FieldDeletedAt:
+		return m.DeletedAt()
+	case admindictkey.FieldDictLabel:
+		return m.DictLabel()
+	case admindictkey.FieldDictCode:
+		return m.DictCode()
+	case admindictkey.FieldSort:
+		return m.Sort()
+	case admindictkey.FieldRemarks:
+		return m.Remarks()
+	case admindictkey.FieldIsEnable:
+		return m.IsEnable()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *AdminDictKeyMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case admindictkey.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case admindictkey.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case admindictkey.FieldDeletedAt:
+		return m.OldDeletedAt(ctx)
+	case admindictkey.FieldDictLabel:
+		return m.OldDictLabel(ctx)
+	case admindictkey.FieldDictCode:
+		return m.OldDictCode(ctx)
+	case admindictkey.FieldSort:
+		return m.OldSort(ctx)
+	case admindictkey.FieldRemarks:
+		return m.OldRemarks(ctx)
+	case admindictkey.FieldIsEnable:
+		return m.OldIsEnable(ctx)
+	}
+	return nil, fmt.Errorf("unknown AdminDictKey field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *AdminDictKeyMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case admindictkey.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case admindictkey.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case admindictkey.FieldDeletedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeletedAt(v)
+		return nil
+	case admindictkey.FieldDictLabel:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDictLabel(v)
+		return nil
+	case admindictkey.FieldDictCode:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDictCode(v)
+		return nil
+	case admindictkey.FieldSort:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSort(v)
+		return nil
+	case admindictkey.FieldRemarks:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRemarks(v)
+		return nil
+	case admindictkey.FieldIsEnable:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIsEnable(v)
+		return nil
+	}
+	return fmt.Errorf("unknown AdminDictKey field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *AdminDictKeyMutation) AddedFields() []string {
+	var fields []string
+	if m.addsort != nil {
+		fields = append(fields, admindictkey.FieldSort)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *AdminDictKeyMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case admindictkey.FieldSort:
+		return m.AddedSort()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *AdminDictKeyMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case admindictkey.FieldSort:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddSort(v)
+		return nil
+	}
+	return fmt.Errorf("unknown AdminDictKey numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *AdminDictKeyMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(admindictkey.FieldUpdatedAt) {
+		fields = append(fields, admindictkey.FieldUpdatedAt)
+	}
+	if m.FieldCleared(admindictkey.FieldDeletedAt) {
+		fields = append(fields, admindictkey.FieldDeletedAt)
+	}
+	if m.FieldCleared(admindictkey.FieldSort) {
+		fields = append(fields, admindictkey.FieldSort)
+	}
+	if m.FieldCleared(admindictkey.FieldRemarks) {
+		fields = append(fields, admindictkey.FieldRemarks)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *AdminDictKeyMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *AdminDictKeyMutation) ClearField(name string) error {
+	switch name {
+	case admindictkey.FieldUpdatedAt:
+		m.ClearUpdatedAt()
+		return nil
+	case admindictkey.FieldDeletedAt:
+		m.ClearDeletedAt()
+		return nil
+	case admindictkey.FieldSort:
+		m.ClearSort()
+		return nil
+	case admindictkey.FieldRemarks:
+		m.ClearRemarks()
+		return nil
+	}
+	return fmt.Errorf("unknown AdminDictKey nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *AdminDictKeyMutation) ResetField(name string) error {
+	switch name {
+	case admindictkey.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case admindictkey.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case admindictkey.FieldDeletedAt:
+		m.ResetDeletedAt()
+		return nil
+	case admindictkey.FieldDictLabel:
+		m.ResetDictLabel()
+		return nil
+	case admindictkey.FieldDictCode:
+		m.ResetDictCode()
+		return nil
+	case admindictkey.FieldSort:
+		m.ResetSort()
+		return nil
+	case admindictkey.FieldRemarks:
+		m.ResetRemarks()
+		return nil
+	case admindictkey.FieldIsEnable:
+		m.ResetIsEnable()
+		return nil
+	}
+	return fmt.Errorf("unknown AdminDictKey field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *AdminDictKeyMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m._P != nil {
+		edges = append(edges, admindictkey.EdgeP)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *AdminDictKeyMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case admindictkey.EdgeP:
+		if id := m._P; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *AdminDictKeyMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *AdminDictKeyMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *AdminDictKeyMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.cleared_P {
+		edges = append(edges, admindictkey.EdgeP)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *AdminDictKeyMutation) EdgeCleared(name string) bool {
+	switch name {
+	case admindictkey.EdgeP:
+		return m.cleared_P
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *AdminDictKeyMutation) ClearEdge(name string) error {
+	switch name {
+	case admindictkey.EdgeP:
+		m.ClearP()
+		return nil
+	}
+	return fmt.Errorf("unknown AdminDictKey unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *AdminDictKeyMutation) ResetEdge(name string) error {
+	switch name {
+	case admindictkey.EdgeP:
+		m.ResetP()
+		return nil
+	}
+	return fmt.Errorf("unknown AdminDictKey edge %s", name)
+}
 
 // AdminMenusMutation represents an operation that mutates the AdminMenus nodes in the graph.
 type AdminMenusMutation struct {

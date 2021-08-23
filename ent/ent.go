@@ -10,6 +10,8 @@ import (
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/a20070322/go_fast_admin/ent/admindict"
+	"github.com/a20070322/go_fast_admin/ent/admindictkey"
 	"github.com/a20070322/go_fast_admin/ent/adminmenus"
 	"github.com/a20070322/go_fast_admin/ent/adminrole"
 	"github.com/a20070322/go_fast_admin/ent/adminuser"
@@ -33,9 +35,11 @@ type OrderFunc func(*sql.Selector)
 // columnChecker returns a function indicates if the column exists in the given column.
 func columnChecker(table string) func(string) error {
 	checks := map[string]func(string) bool{
-		adminmenus.Table: adminmenus.ValidColumn,
-		adminrole.Table:  adminrole.ValidColumn,
-		adminuser.Table:  adminuser.ValidColumn,
+		admindict.Table:    admindict.ValidColumn,
+		admindictkey.Table: admindictkey.ValidColumn,
+		adminmenus.Table:   adminmenus.ValidColumn,
+		adminrole.Table:    adminrole.ValidColumn,
+		adminuser.Table:    adminuser.ValidColumn,
 	}
 	check, ok := checks[table]
 	if !ok {

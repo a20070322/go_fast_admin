@@ -3,6 +3,7 @@ package admin_controller
 import (
 	"github.com/a20070322/go_fast_admin/app/service/admin_menus_service"
 	"github.com/a20070322/go_fast_admin/app/service/cache_service"
+	"github.com/a20070322/go_fast_admin/global"
 	"github.com/a20070322/go_fast_admin/utils/jwt"
 	"github.com/a20070322/go_fast_admin/utils/response"
 	"github.com/gin-gonic/gin"
@@ -70,6 +71,11 @@ func (c AdminMenus) Update(ctx *gin.Context) {
 		response.Fail(ctx, http.StatusBadRequest, err.Error(), nil)
 		return
 	}
+	err = cache_service.Init(ctx).MenuUpdateRefreshRole(rep.ID)
+	if err != nil {
+		global.Logger.Error(err)
+	}
+
 	response.Success(ctx, "ok", rep)
 }
 
@@ -132,10 +138,10 @@ func (c AdminMenus) GetUserMenu(ctx *gin.Context) {
 
 	for _, v := range u.Edges.Role {
 		if v.IsEnable {
-			roles = append(roles,v.ID)
+			roles = append(roles, v.ID)
 		}
 	}
-	rep,err := admin_menus_service.Init(ctx).GetUserMenu(roles)
+	rep, err := cache_service.Init(ctx).GetUserMenu(roles)
 	if err != nil {
 		response.Fail(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return

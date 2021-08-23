@@ -12,6 +12,10 @@ import (
 // Tx is a transactional client that is created by calling Client.Tx().
 type Tx struct {
 	config
+	// AdminDict is the client for interacting with the AdminDict builders.
+	AdminDict *AdminDictClient
+	// AdminDictKey is the client for interacting with the AdminDictKey builders.
+	AdminDictKey *AdminDictKeyClient
 	// AdminMenus is the client for interacting with the AdminMenus builders.
 	AdminMenus *AdminMenusClient
 	// AdminRole is the client for interacting with the AdminRole builders.
@@ -153,6 +157,8 @@ func (tx *Tx) Client() *Client {
 }
 
 func (tx *Tx) init() {
+	tx.AdminDict = NewAdminDictClient(tx.config)
+	tx.AdminDictKey = NewAdminDictKeyClient(tx.config)
 	tx.AdminMenus = NewAdminMenusClient(tx.config)
 	tx.AdminRole = NewAdminRoleClient(tx.config)
 	tx.AdminUser = NewAdminUserClient(tx.config)
@@ -165,7 +171,7 @@ func (tx *Tx) init() {
 // of them in order to commit or rollback the transaction.
 //
 // If a closed transaction is embedded in one of the generated entities, and the entity
-// applies a query, for example: AdminMenus.QueryXXX(), the query will be executed
+// applies a query, for example: AdminDict.QueryXXX(), the query will be executed
 // through the driver which created this transaction.
 //
 // Note that txDriver is not goroutine safe.

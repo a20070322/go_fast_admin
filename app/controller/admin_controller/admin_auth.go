@@ -48,7 +48,7 @@ func (c AdminAuth) RefreshToken(ctx *gin.Context) {
 		return
 	}
 	if isCheck != true {
-		response.Fail(ctx, http.StatusBadRequest, "refresh_token已失效", nil)
+		response.Fail(ctx, http.StatusUnprocessableEntity, "refresh_token已失效", nil)
 		return
 	}
 	user, err3 := admin_user_service.Init(ctx).FindById(claims.UserID)
@@ -58,7 +58,7 @@ func (c AdminAuth) RefreshToken(ctx *gin.Context) {
 	}
 	rep, err4 := admin_auth_service.Init(ctx).GetToken(user)
 	if err4 != nil {
-		response.Fail(ctx, http.StatusBadRequest, err4.Error(), nil)
+		response.Fail(ctx, http.StatusInternalServerError, err4.Error(), nil)
 		return
 	}
 	response.Success(ctx, "ok", rep)

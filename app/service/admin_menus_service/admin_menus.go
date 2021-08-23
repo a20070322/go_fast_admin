@@ -4,11 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/a20070322/go_fast_admin/app/service/cache_service"
 	"github.com/a20070322/go_fast_admin/ent"
 	"github.com/a20070322/go_fast_admin/ent/adminmenus"
 	"github.com/a20070322/go_fast_admin/ent/predicate"
 	"github.com/a20070322/go_fast_admin/global"
+	"github.com/a20070322/go_fast_admin/types"
 	"github.com/a20070322/go_fast_admin/utils/ent_utils"
 	"time"
 )
@@ -51,12 +51,12 @@ func (m *AdminMenus) List(form *FormList) (rep RepList, err error) {
 }
 
 //列表
-func (m *AdminMenus) TreeList(form *FormList) (rep []*MenusTree, err error) {
+func (m *AdminMenus) TreeList(form *FormList) (rep []*types.MenusTree, err error) {
 	//查询条件数组
 	var whereArr []predicate.AdminMenus
 	whereArr = append(whereArr, adminmenus.DeletedAtIsNil())
 	//查询
-	list, err := m.db.Query().Where(whereArr...).All(m.ctx)
+	list, err := m.db.Query().Where(whereArr...).Order(ent.Desc(adminmenus.FieldSort)).All(m.ctx)
 	if err != nil {
 		return rep, err
 	}
@@ -73,6 +73,7 @@ func (m *AdminMenus) Create(form *FormCreate) (rep RepCreate, err error) {
 		SetRouterPath(form.RouterPath).
 		SetIcon(form.Icon).
 		SetType(form.Type).
+		SetPathAction(form.PathAction).
 		SetPowerStr(form.PowerStr).
 		SetSort(form.Sort).
 		SetFid(form.Fid).
@@ -98,6 +99,7 @@ func (m *AdminMenus) Update(id int, form *FormUpdate) (rep RepUpdate, err error)
 		SetName(form.Name).
 		SetPath(form.Path).
 		SetRouterPath(form.RouterPath).
+		SetPathAction(form.PathAction).
 		SetIcon(form.Icon).
 		SetType(form.Type).
 		SetPowerStr(form.PowerStr).
@@ -147,54 +149,22 @@ func (m *AdminMenus) FindById(id int) (rep *ent.AdminMenus, err error) {
 	return rep, err
 }
 
-//func (m *AdminMenus) GetUserMenu(roleIds []int) (RepGetUserMenu, error) {
-//	var rep RepGetUserMenu
-//	//获取目录及菜单
-//	menus, err := m.db.Query().Where(adminmenus.DeletedAtIsNil(), adminmenus.HasRoleWith(adminrole.IDIn(roleIds...)), adminmenus.TypeIn(1, 2), adminmenus.IsEnable(true)).All(m.ctx)
-//	if err != nil {
-//		return rep, err
-//	}
-//	rep.Menu = MenuToTree(menus, 0, 1)
-//	rep.Role, err = m.db.Query().Where(adminmenus.DeletedAtIsNil(), adminmenus.HasRoleWith(adminrole.IDIn(roleIds...)), adminmenus.TypeEQ(3), adminmenus.IsEnable(true)).All(m.ctx)
-//	if err != nil {
-//		return rep, err
-//	}
-//	return rep, err
-//}
-
-func (m *AdminMenus) GetUserMenu(roleIds []int) (RepGetUserMenu, error) {
-	var rep RepGetUserMenu
-	var menus []*ent.AdminMenus
-	for _, v := range roleIds {
-		role, err := cache_service.Init(m.ctx).GetAdminRoleCatch(v)
-		if err != nil {
-			return rep, err
-		}
-		if role.IsEnable == true {
-			for _, menu := range role.Edges.Menu {
-				if menu.IsEnable == true {
-					//目录及菜单
-					if menu.Type == 1 || menu.Type == 2 {
-						menus = append(menus, menu)
-					}
-					//按钮带权限标识
-					if menu.Type == 3 {
-						rep.Role = append(rep.Role, menu)
-					}
-				}
-			}
-
-		}
+//查找
+func (m *AdminMenus) GetWithRole(id int) (rep []*ent.AdminRole, err error) {
+	rep, err = m.db.Query().Where(adminmenus.IDEQ(id)).QueryRole().WithMenu(func(query *ent.AdminMenusQuery) {
+		query.Where(adminmenus.DeletedAtIsNil())
+	}).All(m.ctx)
+	if err != nil {
+		return rep, errors.New("user is not find")
 	}
-	rep.Menu = MenuToTree(menus, 0, 1)
-	return rep, nil
+	return rep, err
 }
 
-func MenuToTree(menus []*ent.AdminMenus, fid int, t int) []*MenusTree {
-	var treeList []*MenusTree
+func MenuToTree(menus []*ent.AdminMenus, fid int, t int) []*types.MenusTree {
+	var treeList []*types.MenusTree
 	for _, v := range menus {
 		if v.Fid == fid && (v.IsShow && v.IsEnable || t != 1) {
-			treeList = append(treeList, &MenusTree{
+			treeList = append(treeList, &types.MenusTree{
 				AdminMenus: v,
 				Children:   MenuToTree(menus, v.ID, t),
 			})
