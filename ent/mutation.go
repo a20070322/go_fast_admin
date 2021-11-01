@@ -13,6 +13,7 @@ import (
 	"github.com/a20070322/go_fast_admin/ent/adminmenus"
 	"github.com/a20070322/go_fast_admin/ent/adminrole"
 	"github.com/a20070322/go_fast_admin/ent/adminuser"
+	"github.com/a20070322/go_fast_admin/ent/autouserexample"
 	"github.com/a20070322/go_fast_admin/ent/predicate"
 	"github.com/google/uuid"
 
@@ -28,11 +29,12 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
-	TypeAdminDict    = "AdminDict"
-	TypeAdminDictKey = "AdminDictKey"
-	TypeAdminMenus   = "AdminMenus"
-	TypeAdminRole    = "AdminRole"
-	TypeAdminUser    = "AdminUser"
+	TypeAdminDict       = "AdminDict"
+	TypeAdminDictKey    = "AdminDictKey"
+	TypeAdminMenus      = "AdminMenus"
+	TypeAdminRole       = "AdminRole"
+	TypeAdminUser       = "AdminUser"
+	TypeAutoUserExample = "AutoUserExample"
 )
 
 // AdminDictMutation represents an operation that mutates the AdminDict nodes in the graph.
@@ -4715,4 +4717,696 @@ func (m *AdminUserMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown AdminUser edge %s", name)
+}
+
+// AutoUserExampleMutation represents an operation that mutates the AutoUserExample nodes in the graph.
+type AutoUserExampleMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *int
+	created_at    *time.Time
+	updated_at    *time.Time
+	deleted_at    *time.Time
+	test_text     *string
+	test_bool     *bool
+	test_int      *int
+	addtest_int   *int
+	clearedFields map[string]struct{}
+	done          bool
+	oldValue      func(context.Context) (*AutoUserExample, error)
+	predicates    []predicate.AutoUserExample
+}
+
+var _ ent.Mutation = (*AutoUserExampleMutation)(nil)
+
+// autouserexampleOption allows management of the mutation configuration using functional options.
+type autouserexampleOption func(*AutoUserExampleMutation)
+
+// newAutoUserExampleMutation creates new mutation for the AutoUserExample entity.
+func newAutoUserExampleMutation(c config, op Op, opts ...autouserexampleOption) *AutoUserExampleMutation {
+	m := &AutoUserExampleMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeAutoUserExample,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withAutoUserExampleID sets the ID field of the mutation.
+func withAutoUserExampleID(id int) autouserexampleOption {
+	return func(m *AutoUserExampleMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *AutoUserExample
+		)
+		m.oldValue = func(ctx context.Context) (*AutoUserExample, error) {
+			once.Do(func() {
+				if m.done {
+					err = fmt.Errorf("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().AutoUserExample.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withAutoUserExample sets the old AutoUserExample of the mutation.
+func withAutoUserExample(node *AutoUserExample) autouserexampleOption {
+	return func(m *AutoUserExampleMutation) {
+		m.oldValue = func(context.Context) (*AutoUserExample, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m AutoUserExampleMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m AutoUserExampleMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, fmt.Errorf("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID
+// is only available if it was provided to the builder.
+func (m *AutoUserExampleMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *AutoUserExampleMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *AutoUserExampleMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the AutoUserExample entity.
+// If the AutoUserExample object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AutoUserExampleMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *AutoUserExampleMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *AutoUserExampleMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *AutoUserExampleMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the AutoUserExample entity.
+// If the AutoUserExample object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AutoUserExampleMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ClearUpdatedAt clears the value of the "updated_at" field.
+func (m *AutoUserExampleMutation) ClearUpdatedAt() {
+	m.updated_at = nil
+	m.clearedFields[autouserexample.FieldUpdatedAt] = struct{}{}
+}
+
+// UpdatedAtCleared returns if the "updated_at" field was cleared in this mutation.
+func (m *AutoUserExampleMutation) UpdatedAtCleared() bool {
+	_, ok := m.clearedFields[autouserexample.FieldUpdatedAt]
+	return ok
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *AutoUserExampleMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+	delete(m.clearedFields, autouserexample.FieldUpdatedAt)
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (m *AutoUserExampleMutation) SetDeletedAt(t time.Time) {
+	m.deleted_at = &t
+}
+
+// DeletedAt returns the value of the "deleted_at" field in the mutation.
+func (m *AutoUserExampleMutation) DeletedAt() (r time.Time, exists bool) {
+	v := m.deleted_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeletedAt returns the old "deleted_at" field's value of the AutoUserExample entity.
+// If the AutoUserExample object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AutoUserExampleMutation) OldDeletedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldDeletedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldDeletedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeletedAt: %w", err)
+	}
+	return oldValue.DeletedAt, nil
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (m *AutoUserExampleMutation) ClearDeletedAt() {
+	m.deleted_at = nil
+	m.clearedFields[autouserexample.FieldDeletedAt] = struct{}{}
+}
+
+// DeletedAtCleared returns if the "deleted_at" field was cleared in this mutation.
+func (m *AutoUserExampleMutation) DeletedAtCleared() bool {
+	_, ok := m.clearedFields[autouserexample.FieldDeletedAt]
+	return ok
+}
+
+// ResetDeletedAt resets all changes to the "deleted_at" field.
+func (m *AutoUserExampleMutation) ResetDeletedAt() {
+	m.deleted_at = nil
+	delete(m.clearedFields, autouserexample.FieldDeletedAt)
+}
+
+// SetTestText sets the "test_text" field.
+func (m *AutoUserExampleMutation) SetTestText(s string) {
+	m.test_text = &s
+}
+
+// TestText returns the value of the "test_text" field in the mutation.
+func (m *AutoUserExampleMutation) TestText() (r string, exists bool) {
+	v := m.test_text
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTestText returns the old "test_text" field's value of the AutoUserExample entity.
+// If the AutoUserExample object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AutoUserExampleMutation) OldTestText(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldTestText is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldTestText requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTestText: %w", err)
+	}
+	return oldValue.TestText, nil
+}
+
+// ClearTestText clears the value of the "test_text" field.
+func (m *AutoUserExampleMutation) ClearTestText() {
+	m.test_text = nil
+	m.clearedFields[autouserexample.FieldTestText] = struct{}{}
+}
+
+// TestTextCleared returns if the "test_text" field was cleared in this mutation.
+func (m *AutoUserExampleMutation) TestTextCleared() bool {
+	_, ok := m.clearedFields[autouserexample.FieldTestText]
+	return ok
+}
+
+// ResetTestText resets all changes to the "test_text" field.
+func (m *AutoUserExampleMutation) ResetTestText() {
+	m.test_text = nil
+	delete(m.clearedFields, autouserexample.FieldTestText)
+}
+
+// SetTestBool sets the "test_bool" field.
+func (m *AutoUserExampleMutation) SetTestBool(b bool) {
+	m.test_bool = &b
+}
+
+// TestBool returns the value of the "test_bool" field in the mutation.
+func (m *AutoUserExampleMutation) TestBool() (r bool, exists bool) {
+	v := m.test_bool
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTestBool returns the old "test_bool" field's value of the AutoUserExample entity.
+// If the AutoUserExample object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AutoUserExampleMutation) OldTestBool(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldTestBool is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldTestBool requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTestBool: %w", err)
+	}
+	return oldValue.TestBool, nil
+}
+
+// ClearTestBool clears the value of the "test_bool" field.
+func (m *AutoUserExampleMutation) ClearTestBool() {
+	m.test_bool = nil
+	m.clearedFields[autouserexample.FieldTestBool] = struct{}{}
+}
+
+// TestBoolCleared returns if the "test_bool" field was cleared in this mutation.
+func (m *AutoUserExampleMutation) TestBoolCleared() bool {
+	_, ok := m.clearedFields[autouserexample.FieldTestBool]
+	return ok
+}
+
+// ResetTestBool resets all changes to the "test_bool" field.
+func (m *AutoUserExampleMutation) ResetTestBool() {
+	m.test_bool = nil
+	delete(m.clearedFields, autouserexample.FieldTestBool)
+}
+
+// SetTestInt sets the "test_int" field.
+func (m *AutoUserExampleMutation) SetTestInt(i int) {
+	m.test_int = &i
+	m.addtest_int = nil
+}
+
+// TestInt returns the value of the "test_int" field in the mutation.
+func (m *AutoUserExampleMutation) TestInt() (r int, exists bool) {
+	v := m.test_int
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTestInt returns the old "test_int" field's value of the AutoUserExample entity.
+// If the AutoUserExample object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AutoUserExampleMutation) OldTestInt(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldTestInt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldTestInt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTestInt: %w", err)
+	}
+	return oldValue.TestInt, nil
+}
+
+// AddTestInt adds i to the "test_int" field.
+func (m *AutoUserExampleMutation) AddTestInt(i int) {
+	if m.addtest_int != nil {
+		*m.addtest_int += i
+	} else {
+		m.addtest_int = &i
+	}
+}
+
+// AddedTestInt returns the value that was added to the "test_int" field in this mutation.
+func (m *AutoUserExampleMutation) AddedTestInt() (r int, exists bool) {
+	v := m.addtest_int
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearTestInt clears the value of the "test_int" field.
+func (m *AutoUserExampleMutation) ClearTestInt() {
+	m.test_int = nil
+	m.addtest_int = nil
+	m.clearedFields[autouserexample.FieldTestInt] = struct{}{}
+}
+
+// TestIntCleared returns if the "test_int" field was cleared in this mutation.
+func (m *AutoUserExampleMutation) TestIntCleared() bool {
+	_, ok := m.clearedFields[autouserexample.FieldTestInt]
+	return ok
+}
+
+// ResetTestInt resets all changes to the "test_int" field.
+func (m *AutoUserExampleMutation) ResetTestInt() {
+	m.test_int = nil
+	m.addtest_int = nil
+	delete(m.clearedFields, autouserexample.FieldTestInt)
+}
+
+// Op returns the operation name.
+func (m *AutoUserExampleMutation) Op() Op {
+	return m.op
+}
+
+// Type returns the node type of this mutation (AutoUserExample).
+func (m *AutoUserExampleMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *AutoUserExampleMutation) Fields() []string {
+	fields := make([]string, 0, 6)
+	if m.created_at != nil {
+		fields = append(fields, autouserexample.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, autouserexample.FieldUpdatedAt)
+	}
+	if m.deleted_at != nil {
+		fields = append(fields, autouserexample.FieldDeletedAt)
+	}
+	if m.test_text != nil {
+		fields = append(fields, autouserexample.FieldTestText)
+	}
+	if m.test_bool != nil {
+		fields = append(fields, autouserexample.FieldTestBool)
+	}
+	if m.test_int != nil {
+		fields = append(fields, autouserexample.FieldTestInt)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *AutoUserExampleMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case autouserexample.FieldCreatedAt:
+		return m.CreatedAt()
+	case autouserexample.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case autouserexample.FieldDeletedAt:
+		return m.DeletedAt()
+	case autouserexample.FieldTestText:
+		return m.TestText()
+	case autouserexample.FieldTestBool:
+		return m.TestBool()
+	case autouserexample.FieldTestInt:
+		return m.TestInt()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *AutoUserExampleMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case autouserexample.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case autouserexample.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case autouserexample.FieldDeletedAt:
+		return m.OldDeletedAt(ctx)
+	case autouserexample.FieldTestText:
+		return m.OldTestText(ctx)
+	case autouserexample.FieldTestBool:
+		return m.OldTestBool(ctx)
+	case autouserexample.FieldTestInt:
+		return m.OldTestInt(ctx)
+	}
+	return nil, fmt.Errorf("unknown AutoUserExample field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *AutoUserExampleMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case autouserexample.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case autouserexample.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case autouserexample.FieldDeletedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeletedAt(v)
+		return nil
+	case autouserexample.FieldTestText:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTestText(v)
+		return nil
+	case autouserexample.FieldTestBool:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTestBool(v)
+		return nil
+	case autouserexample.FieldTestInt:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTestInt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown AutoUserExample field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *AutoUserExampleMutation) AddedFields() []string {
+	var fields []string
+	if m.addtest_int != nil {
+		fields = append(fields, autouserexample.FieldTestInt)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *AutoUserExampleMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case autouserexample.FieldTestInt:
+		return m.AddedTestInt()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *AutoUserExampleMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case autouserexample.FieldTestInt:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddTestInt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown AutoUserExample numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *AutoUserExampleMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(autouserexample.FieldUpdatedAt) {
+		fields = append(fields, autouserexample.FieldUpdatedAt)
+	}
+	if m.FieldCleared(autouserexample.FieldDeletedAt) {
+		fields = append(fields, autouserexample.FieldDeletedAt)
+	}
+	if m.FieldCleared(autouserexample.FieldTestText) {
+		fields = append(fields, autouserexample.FieldTestText)
+	}
+	if m.FieldCleared(autouserexample.FieldTestBool) {
+		fields = append(fields, autouserexample.FieldTestBool)
+	}
+	if m.FieldCleared(autouserexample.FieldTestInt) {
+		fields = append(fields, autouserexample.FieldTestInt)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *AutoUserExampleMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *AutoUserExampleMutation) ClearField(name string) error {
+	switch name {
+	case autouserexample.FieldUpdatedAt:
+		m.ClearUpdatedAt()
+		return nil
+	case autouserexample.FieldDeletedAt:
+		m.ClearDeletedAt()
+		return nil
+	case autouserexample.FieldTestText:
+		m.ClearTestText()
+		return nil
+	case autouserexample.FieldTestBool:
+		m.ClearTestBool()
+		return nil
+	case autouserexample.FieldTestInt:
+		m.ClearTestInt()
+		return nil
+	}
+	return fmt.Errorf("unknown AutoUserExample nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *AutoUserExampleMutation) ResetField(name string) error {
+	switch name {
+	case autouserexample.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case autouserexample.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case autouserexample.FieldDeletedAt:
+		m.ResetDeletedAt()
+		return nil
+	case autouserexample.FieldTestText:
+		m.ResetTestText()
+		return nil
+	case autouserexample.FieldTestBool:
+		m.ResetTestBool()
+		return nil
+	case autouserexample.FieldTestInt:
+		m.ResetTestInt()
+		return nil
+	}
+	return fmt.Errorf("unknown AutoUserExample field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *AutoUserExampleMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *AutoUserExampleMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *AutoUserExampleMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *AutoUserExampleMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *AutoUserExampleMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *AutoUserExampleMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *AutoUserExampleMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown AutoUserExample unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *AutoUserExampleMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown AutoUserExample edge %s", name)
 }

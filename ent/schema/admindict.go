@@ -2,7 +2,8 @@ package schema
 import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
-	"entgo.io/ent/schema/field")
+	"entgo.io/ent/schema/field"
+	)
 // AdminDict holds the schema definition for the AdminDict entity.
 type AdminDict struct {
 	ent.Schema

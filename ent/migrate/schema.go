@@ -114,6 +114,23 @@ var (
 		PrimaryKey:  []*schema.Column{AdminUsersColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{},
 	}
+	// AutoUserExamplesColumns holds the columns for the "auto_user_examples" table.
+	AutoUserExamplesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
+		{Name: "test_text", Type: field.TypeString, Nullable: true, Default: ""},
+		{Name: "test_bool", Type: field.TypeBool, Nullable: true, Default: true},
+		{Name: "test_int", Type: field.TypeInt, Nullable: true},
+	}
+	// AutoUserExamplesTable holds the schema information for the "auto_user_examples" table.
+	AutoUserExamplesTable = &schema.Table{
+		Name:        "auto_user_examples",
+		Columns:     AutoUserExamplesColumns,
+		PrimaryKey:  []*schema.Column{AutoUserExamplesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{},
+	}
 	// AdminRoleUserColumns holds the columns for the "admin_role_user" table.
 	AdminRoleUserColumns = []*schema.Column{
 		{Name: "admin_role_id", Type: field.TypeInt},
@@ -171,6 +188,7 @@ var (
 		AdminMenusTable,
 		AdminRolesTable,
 		AdminUsersTable,
+		AutoUserExamplesTable,
 		AdminRoleUserTable,
 		AdminRoleMenuTable,
 	}

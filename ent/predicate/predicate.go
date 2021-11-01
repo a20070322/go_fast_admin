@@ -20,3 +20,6 @@ type AdminRole func(*sql.Selector)
 
 // AdminUser is the predicate function for adminuser builders.
 type AdminUser func(*sql.Selector)
+
+// AutoUserExample is the predicate function for autouserexample builders.
+type AutoUserExample func(*sql.Selector)

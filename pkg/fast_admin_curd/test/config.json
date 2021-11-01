@@ -1,0 +1,89 @@
+{
+  "model_name": "AutoUserExample",
+  "model_comment": "自动生成测试",
+  "project_config": {
+    "work_path": "/Users/zhaozhongyang/Desktop/开源项目/goAdmin",
+    "module_path": "github.com/a20070322/go_fast_admin",
+    "router_path": "router/router_admin.go",
+    "routing_prefix": "/api/admin",
+    "schema_path": "ent/schema",
+    "service_path": "app/service",
+    "controller_path": "app/controller/admin_controller"
+  },
+  "generate_config": {
+    "is_force": true,
+    "is_has_update": true,
+    "is_has_delete": true,
+    "is_has_show": true,
+    "is_has_jwt_auth": true,
+    "is_has_rbac": true,
+    "is_add_menu": true,
+    "is_soft_del": true,
+    "parent_menu_id": 0
+  },
+  "table_config": {
+    "is_soft_del": true,
+    "mixin": [
+      "AuditMixin"
+    ],
+    "fields": [
+      {
+        "id": 1629716518824,
+        "field_type": "String",
+        "field_name": "test_text",
+        "field_comment": "文本域测试",
+        "field_default": "\"\"",
+        "is_sensitive": false,
+        "is_optional": true,
+        "is_unique": false,
+        "is_insert": true,
+        "is_edit": true,
+        "is_list_show": true,
+        "is_list_default_show": true,
+        "is_search": true,
+        "search_type": "6",
+        "show_type": "1",
+        "show_config": "",
+        "dict_type": ""
+      },
+      {
+        "id": 1629716518824,
+        "field_type": "Bool",
+        "field_name": "test_bool",
+        "field_comment": "布尔值测试",
+        "field_default": "true",
+        "is_sensitive": false,
+        "is_optional": true,
+        "is_unique": false,
+        "is_insert": true,
+        "is_edit": true,
+        "is_list_show": true,
+        "is_list_default_show": true,
+        "is_search": true,
+        "search_type": "6",
+        "show_type": "1",
+        "show_config": "",
+        "dict_type": ""
+      },
+      {
+        "id": 1629716518824,
+        "field_type": "Int",
+        "field_name": "test_int",
+        "field_comment": "数字类型测试",
+        "field_default": "",
+        "is_sensitive": false,
+        "is_optional": true,
+        "is_unique": false,
+        "is_insert": true,
+        "is_edit": true,
+        "is_list_show": true,
+        "is_list_default_show": true,
+        "is_search": true,
+        "search_type": "6",
+        "show_type": "1",
+        "show_config": "",
+        "dict_type": ""
+      }
+    ]
+  }
+}

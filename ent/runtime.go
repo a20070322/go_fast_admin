@@ -10,6 +10,7 @@ import (
 	"github.com/a20070322/go_fast_admin/ent/adminmenus"
 	"github.com/a20070322/go_fast_admin/ent/adminrole"
 	"github.com/a20070322/go_fast_admin/ent/adminuser"
+	"github.com/a20070322/go_fast_admin/ent/autouserexample"
 	"github.com/a20070322/go_fast_admin/ent/schema"
 	"github.com/google/uuid"
 )
@@ -121,4 +122,25 @@ func init() {
 	adminuserDescID := adminuserFields[0].Descriptor()
 	// adminuser.DefaultID holds the default value on creation for the id field.
 	adminuser.DefaultID = adminuserDescID.Default.(func() uuid.UUID)
+	autouserexampleMixin := schema.AutoUserExample{}.Mixin()
+	autouserexampleMixinFields0 := autouserexampleMixin[0].Fields()
+	_ = autouserexampleMixinFields0
+	autouserexampleFields := schema.AutoUserExample{}.Fields()
+	_ = autouserexampleFields
+	// autouserexampleDescCreatedAt is the schema descriptor for created_at field.
+	autouserexampleDescCreatedAt := autouserexampleMixinFields0[0].Descriptor()
+	// autouserexample.DefaultCreatedAt holds the default value on creation for the created_at field.
+	autouserexample.DefaultCreatedAt = autouserexampleDescCreatedAt.Default.(func() time.Time)
+	// autouserexampleDescUpdatedAt is the schema descriptor for updated_at field.
+	autouserexampleDescUpdatedAt := autouserexampleMixinFields0[1].Descriptor()
+	// autouserexample.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	autouserexample.UpdateDefaultUpdatedAt = autouserexampleDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// autouserexampleDescTestText is the schema descriptor for test_text field.
+	autouserexampleDescTestText := autouserexampleFields[0].Descriptor()
+	// autouserexample.DefaultTestText holds the default value on creation for the test_text field.
+	autouserexample.DefaultTestText = autouserexampleDescTestText.Default.(string)
+	// autouserexampleDescTestBool is the schema descriptor for test_bool field.
+	autouserexampleDescTestBool := autouserexampleFields[1].Descriptor()
+	// autouserexample.DefaultTestBool holds the default value on creation for the test_bool field.
+	autouserexample.DefaultTestBool = autouserexampleDescTestBool.Default.(bool)
 }

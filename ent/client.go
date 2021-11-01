@@ -15,6 +15,7 @@ import (
 	"github.com/a20070322/go_fast_admin/ent/adminmenus"
 	"github.com/a20070322/go_fast_admin/ent/adminrole"
 	"github.com/a20070322/go_fast_admin/ent/adminuser"
+	"github.com/a20070322/go_fast_admin/ent/autouserexample"
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
@@ -36,6 +37,8 @@ type Client struct {
 	AdminRole *AdminRoleClient
 	// AdminUser is the client for interacting with the AdminUser builders.
 	AdminUser *AdminUserClient
+	// AutoUserExample is the client for interacting with the AutoUserExample builders.
+	AutoUserExample *AutoUserExampleClient
 }
 
 // NewClient creates a new client configured with the given options.
@@ -54,6 +57,7 @@ func (c *Client) init() {
 	c.AdminMenus = NewAdminMenusClient(c.config)
 	c.AdminRole = NewAdminRoleClient(c.config)
 	c.AdminUser = NewAdminUserClient(c.config)
+	c.AutoUserExample = NewAutoUserExampleClient(c.config)
 }
 
 // Open opens a database/sql.DB specified by the driver name and
@@ -85,13 +89,14 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:          ctx,
-		config:       cfg,
-		AdminDict:    NewAdminDictClient(cfg),
-		AdminDictKey: NewAdminDictKeyClient(cfg),
-		AdminMenus:   NewAdminMenusClient(cfg),
-		AdminRole:    NewAdminRoleClient(cfg),
-		AdminUser:    NewAdminUserClient(cfg),
+		ctx:             ctx,
+		config:          cfg,
+		AdminDict:       NewAdminDictClient(cfg),
+		AdminDictKey:    NewAdminDictKeyClient(cfg),
+		AdminMenus:      NewAdminMenusClient(cfg),
+		AdminRole:       NewAdminRoleClient(cfg),
+		AdminUser:       NewAdminUserClient(cfg),
+		AutoUserExample: NewAutoUserExampleClient(cfg),
 	}, nil
 }
 
@@ -109,12 +114,13 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		config:       cfg,
-		AdminDict:    NewAdminDictClient(cfg),
-		AdminDictKey: NewAdminDictKeyClient(cfg),
-		AdminMenus:   NewAdminMenusClient(cfg),
-		AdminRole:    NewAdminRoleClient(cfg),
-		AdminUser:    NewAdminUserClient(cfg),
+		config:          cfg,
+		AdminDict:       NewAdminDictClient(cfg),
+		AdminDictKey:    NewAdminDictKeyClient(cfg),
+		AdminMenus:      NewAdminMenusClient(cfg),
+		AdminRole:       NewAdminRoleClient(cfg),
+		AdminUser:       NewAdminUserClient(cfg),
+		AutoUserExample: NewAutoUserExampleClient(cfg),
 	}, nil
 }
 
@@ -149,6 +155,7 @@ func (c *Client) Use(hooks ...Hook) {
 	c.AdminMenus.Use(hooks...)
 	c.AdminRole.Use(hooks...)
 	c.AdminUser.Use(hooks...)
+	c.AutoUserExample.Use(hooks...)
 }
 
 // AdminDictClient is a client for the AdminDict schema.
@@ -695,4 +702,94 @@ func (c *AdminUserClient) QueryRole(au *AdminUser) *AdminRoleQuery {
 // Hooks returns the client hooks.
 func (c *AdminUserClient) Hooks() []Hook {
 	return c.hooks.AdminUser
+}
+
+// AutoUserExampleClient is a client for the AutoUserExample schema.
+type AutoUserExampleClient struct {
+	config
+}
+
+// NewAutoUserExampleClient returns a client for the AutoUserExample from the given config.
+func NewAutoUserExampleClient(c config) *AutoUserExampleClient {
+	return &AutoUserExampleClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `autouserexample.Hooks(f(g(h())))`.
+func (c *AutoUserExampleClient) Use(hooks ...Hook) {
+	c.hooks.AutoUserExample = append(c.hooks.AutoUserExample, hooks...)
+}
+
+// Create returns a create builder for AutoUserExample.
+func (c *AutoUserExampleClient) Create() *AutoUserExampleCreate {
+	mutation := newAutoUserExampleMutation(c.config, OpCreate)
+	return &AutoUserExampleCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of AutoUserExample entities.
+func (c *AutoUserExampleClient) CreateBulk(builders ...*AutoUserExampleCreate) *AutoUserExampleCreateBulk {
+	return &AutoUserExampleCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for AutoUserExample.
+func (c *AutoUserExampleClient) Update() *AutoUserExampleUpdate {
+	mutation := newAutoUserExampleMutation(c.config, OpUpdate)
+	return &AutoUserExampleUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *AutoUserExampleClient) UpdateOne(aue *AutoUserExample) *AutoUserExampleUpdateOne {
+	mutation := newAutoUserExampleMutation(c.config, OpUpdateOne, withAutoUserExample(aue))
+	return &AutoUserExampleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *AutoUserExampleClient) UpdateOneID(id int) *AutoUserExampleUpdateOne {
+	mutation := newAutoUserExampleMutation(c.config, OpUpdateOne, withAutoUserExampleID(id))
+	return &AutoUserExampleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for AutoUserExample.
+func (c *AutoUserExampleClient) Delete() *AutoUserExampleDelete {
+	mutation := newAutoUserExampleMutation(c.config, OpDelete)
+	return &AutoUserExampleDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *AutoUserExampleClient) DeleteOne(aue *AutoUserExample) *AutoUserExampleDeleteOne {
+	return c.DeleteOneID(aue.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *AutoUserExampleClient) DeleteOneID(id int) *AutoUserExampleDeleteOne {
+	builder := c.Delete().Where(autouserexample.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &AutoUserExampleDeleteOne{builder}
+}
+
+// Query returns a query builder for AutoUserExample.
+func (c *AutoUserExampleClient) Query() *AutoUserExampleQuery {
+	return &AutoUserExampleQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a AutoUserExample entity by its id.
+func (c *AutoUserExampleClient) Get(ctx context.Context, id int) (*AutoUserExample, error) {
+	return c.Query().Where(autouserexample.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *AutoUserExampleClient) GetX(ctx context.Context, id int) *AutoUserExample {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *AutoUserExampleClient) Hooks() []Hook {
+	return c.hooks.AutoUserExample
 }

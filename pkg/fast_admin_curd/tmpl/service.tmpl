@@ -1,0 +1,149 @@
+package {{ .ModelNameCase }}_service
+
+import (
+	"context"
+	"errors"
+	"{{ .ModulePath }}/ent"
+	"{{ .ModulePath }}/ent/{{ .ModelNameLower }}"
+	"{{ .ModulePath }}/ent/predicate"
+	"{{ .ModulePath }}/global"
+	"{{ .ModulePath }}/utils/ent_utils"
+)
+
+//初始化 {{ .ModelName }} service
+func Init(ctx context.Context) *{{ .ModelName }} {
+	art := &{{ .ModelName }}{}
+	art.db = global.Db.{{ .ModelName }}
+	art.ctx = ctx
+	return art
+}
+
+type {{ .ModelName }} struct {
+	db  *ent.{{ .ModelName }}Client
+	ctx context.Context
+}
+
+// {{ .ModelName }}列表
+func (m *{{ .ModelName }}) List(form *FormList) (rep RepList, err error) {
+	// 设置分页默认值
+	ent_utils.PipePagerFn(form)
+	// 查询条件数组
+	var whereArr []predicate.{{ .ModelName }}
+	// todo 字段搜索条件匹配及过滤匹配
+    {{- range $key, $value := .Fields -}}
+        {{ $var := GetFiledType $value.FieldType }}
+        {{ $FieldName := Case2Camel $value.FieldName }}
+        // {{- $value.FieldComment }}过滤
+        {{ if eq  $var "number" -}}
+            if form.{{ $FieldName }} > 0 {
+              whereArr = append(whereArr, {{ $.ModelNameLower }}.{{ $FieldName }}EQ(form.{{ $FieldName }}))
+            }
+        {{- end -}}
+        {{ if eq  $var "string" -}}
+            if form.{{ $FieldName }} != "" {
+              whereArr = append(whereArr, {{ $.ModelNameLower }}.{{ $FieldName }}EQ(form.{{ $FieldName }}))
+            }
+        {{- end -}}
+        {{ if eq  $var "bool" -}}
+         if form.{{ $FieldName }} != "" {
+            switch form.{{ $FieldName }} {
+              case "0":
+                  whereArr = append(whereArr, {{ $.ModelNameLower }}.{{ $FieldName }}EQ(false))
+                  break
+              case "1":
+                  whereArr = append(whereArr, {{ $.ModelNameLower }}.{{ $FieldName }}EQ(true))
+                  break
+              }
+         }
+        {{- end -}}
+    {{- end -}}
+    {{if .IsSoftDel}}
+    // 软删除过滤
+    whereArr = append(whereArr, {{ .ModelNameLower }}.DeletedAtIsNil())
+    {{- end}}
+	// 查询
+	db := m.db.Query().Where(whereArr...)
+	// 获取总条数
+	total, err := db.Count(m.ctx)
+	if err != nil {
+		return rep, err
+	}
+	rep.Total = total
+	// 设置自动分页
+	ent_utils.PipeLimitFn(db, form)
+	rep.Data, err = db.All(m.ctx)
+	if err != nil {
+		return rep, err
+	}
+	return rep, nil
+}
+{{ $FieldsLen := Len .Fields }}
+
+// {{ .ModelName }}创建
+func (m *{{ .ModelName }}) Create(form *FormCreate) (rep RepCreate, err error) {
+	db := m.db.
+		Create().
+	// todo 插入字段过滤
+    {{- range $key, $value := .Fields -}}
+        {{ $FieldName := Case2Camel $value.FieldName }}
+        Set{{ $FieldName }}(form.{{ $FieldName }})
+        {{- if gt  $FieldsLen $key   -}}.{{- end }}
+    {{- end }}
+	u, err := db.Save(m.ctx)
+	if err != nil {
+		return rep, err
+	}
+	rep.{{ .ModelName }} = u
+	return rep, nil
+}
+
+//更新
+func (m *{{ .ModelName }}) Update(id int, form *FormUpdate) (rep RepUpdate, err error) {
+	fup, err := m.FindById(id)
+	if err != nil {
+		return rep, errors.New("{{ .ModelName }} is not found")
+	}
+	db := fup.
+		Update().
+    // todo 更新字段过滤
+    {{- range $key, $value := .Fields -}}
+        {{ $FieldName := Case2Camel $value.FieldName }}
+        Set{{ $FieldName }}(form.{{ $FieldName }})
+        {{- if gt  $FieldsLen $key   -}}.{{- end }}
+    {{- end }}
+	u, err := db.Save(m.ctx)
+	if err != nil {
+		return rep, err
+	}
+	rep.{{ .ModelName }} = u
+	return rep, nil
+}
+
+//删除
+func (m *{{ .ModelName }}) Delete(id int) (err error) {
+	fup, err := m.FindById(id)
+	if err != nil {
+		return errors.New("{{ .ModelName }} is not found")
+	}
+    {{- if .IsSoftDel}}
+    db := fup.
+        Update().
+        SetDeletedAt(time.Now())
+    _, err = db.Save(m.ctx)
+    {{else}}
+    err = m.db.DeleteOneID(fup.ID).Exec(m.ctx)
+    {{ end -}}
+	if err != nil {
+        return err
+    }
+	return nil
+}
+
+//查找
+func (m *{{ .ModelName }}) FindById(id int) (rep *ent.{{ .ModelName }}, err error) {
+	rep, err = m.db.Query().Where(admindict.IDEQ(id), admindict.DeletedAtIsNil()).First(m.ctx)
+	if err != nil {
+		return rep, errors.New("{{ .ModelName }} is not found")
+	}
+	return rep, err
+}

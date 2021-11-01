@@ -22,6 +22,8 @@ type Tx struct {
 	AdminRole *AdminRoleClient
 	// AdminUser is the client for interacting with the AdminUser builders.
 	AdminUser *AdminUserClient
+	// AutoUserExample is the client for interacting with the AutoUserExample builders.
+	AutoUserExample *AutoUserExampleClient
 
 	// lazily loaded.
 	client     *Client
@@ -162,6 +164,7 @@ func (tx *Tx) init() {
 	tx.AdminMenus = NewAdminMenusClient(tx.config)
 	tx.AdminRole = NewAdminRoleClient(tx.config)
 	tx.AdminUser = NewAdminUserClient(tx.config)
+	tx.AutoUserExample = NewAutoUserExampleClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.

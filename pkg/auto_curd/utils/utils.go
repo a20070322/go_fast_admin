@@ -33,14 +33,6 @@ func HumpToLowercase(str string) string {
 	return strings.ToLower(str)
 }
 
-// 内嵌bytes.Buffer，支持连写
-type Buffer struct {
-	*bytes.Buffer
-}
-
-func NewBuffer() *Buffer {
-	return &Buffer{Buffer: new(bytes.Buffer)}
-}
 func IdIsUUIDFn(fields []*config_type.FieldType) (b bool) {
 	b = false
 	for _, v := range fields {
@@ -52,20 +44,22 @@ func IdIsUUIDFn(fields []*config_type.FieldType) (b bool) {
 	return b
 }
 
-// 驼峰式写法转为下划线写法
-func Camel2Case(name string) string {
-	buffer := NewBuffer()
-	for i, r := range name {
-		if unicode.IsUpper(r) {
-			if i != 0 {
-				buffer.Append('_')
-			}
-			buffer.Append(unicode.ToLower(r))
-		} else {
-			buffer.Append(r)
+
+func NewBuffer() *Buffer {
+	return &Buffer{Buffer: new(bytes.Buffer)}
+}
+// 内嵌bytes.Buffer，支持连写
+type Buffer struct {
+	*bytes.Buffer
+}
+func (b *Buffer) append(s string) *Buffer {
+	defer func() {
+		if err := recover(); err != nil {
+			log.Println("*****内存不够了！******")
 		}
-	}
-	return buffer.String()
+	}()
+	b.WriteString(s)
+	return b
 }
 func (b *Buffer) Append(i interface{}) *Buffer {
 	switch val := i.(type) {
@@ -86,15 +80,23 @@ func (b *Buffer) Append(i interface{}) *Buffer {
 	}
 	return b
 }
-func (b *Buffer) append(s string) *Buffer {
-	defer func() {
-		if err := recover(); err != nil {
-			log.Println("*****内存不够了！******")
+// 驼峰式写法转为下划线写法
+func Camel2Case(name string) string {
+	buffer := NewBuffer()
+	for i, r := range name {
+		if unicode.IsUpper(r) {
+			if i != 0 {
+				buffer.Append('_')
+			}
+			buffer.Append(unicode.ToLower(r))
+		} else {
+			buffer.Append(r)
 		}
-	}()
-	b.WriteString(s)
-	return b
+	}
+	return buffer.String()
 }
+
+
 
 // 下划线写法转为驼峰写法
 func Case2Camel(name string) string {

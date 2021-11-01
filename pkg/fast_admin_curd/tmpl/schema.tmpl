@@ -1,0 +1,49 @@
+package schema
+import (
+	"entgo.io/ent"
+	"entgo.io/ent/schema/field"
+	)
+// {{ .ModelName }} holds the schema definition for the {{ .ModelName }} entity.
+
+type {{ .ModelName }} struct {
+	ent.Schema
+}
+
+// {{ .ModelName }}  Mixin
+func ({{ .ModelName }}) Mixin() []ent.Mixin {
+    return []ent.Mixin{
+        {{- range .Mixins}}
+            {{.}}{},
+        {{end -}}
+    }
+}
+
+// Fields of the {{ .ModelName }}.
+func ({{ .ModelName }}) Fields() []ent.Field {
+	return []ent.Field{
+    {{ range .Fields -}}
+        field.{{.FieldType}}("{{.FieldName}}").
+        {{- if .FieldDefault }}
+        Default({{.FieldDefault -}}).
+        {{end -}}
+        {{- if .IsSensitive -}}
+            Sensitive().
+        {{end -}}
+        {{- if .IsOptional -}}
+            Optional().
+        {{end -}}
+        {{- if .IsUnique -}}
+            Unique().
+        {{end -}}
+        Comment("{{.FieldComment -}}"),
+    {{end -}}
+    }
+}
+
+
+// Edges of the {{ .ModelName }}.
+func ({{ .ModelName }}) Edges() []ent.Edge {
+	return []ent.Edge{
+
+	}
+}
