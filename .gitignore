@@ -20,3 +20,4 @@ logs/
 .idea/
 gen/config.json
 .DS_Store
+dist/
